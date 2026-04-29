@@ -55,6 +55,20 @@ Before any other work:
   suggest installing git or pointing `.template-source` at a local
   filesystem path.
 
+## Project folders
+
+Before classifying files, check the project's folder shape:
+
+* `_working/` -- required by this skill (snapshots go here per
+  Information Preservation Rule 1). If missing, create it silently
+  along with `_working/.gitkeep`.
+* `_archive/`, `_attic/` -- optional content folders. The skill never
+  reads from or writes to them, but their absence may be intentional
+  (the user does not want them) or accidental (project predates the
+  convention, or they were deleted). If either is missing, mention it
+  in the migration report and offer to create it. Do NOT auto-create
+  -- the user may have a deliberate reason for the absence.
+
 ## Tracked files
 
 Owned by the template:

@@ -38,6 +38,13 @@ Working material:
   after an agent surfaces a list of fully-absorbed working files (see
   "When asked to consolidate"); agents do not move files into
   `_archive/` themselves.
+* `_attic/` -- Discontinued work that may have future comparative
+  value (a paused design, a deprecated approach kept for reference).
+  Agents do NOT read `_attic/` proactively, do not include it in
+  searches, and do not surface its contents -- only access it when
+  the user explicitly asks ("look in `_attic/` for the old X"). The
+  distinction from `_archive/`: archive is consumed history; attic is
+  parked work that may resume or be compared against later.
 
 Project context:
 

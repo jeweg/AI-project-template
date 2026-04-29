@@ -68,13 +68,13 @@ Owned by the template:
 NOT touched (project-owned content):
 
 * `STATE.md`, `IDENTITY.md`, `VISION.md`
-* All files under `_working/`, `_archive/`
+* All files under `_working/`, `_archive/`, `_attic/`
 * `_working/INDEX.md`
 * Project's `README.md` (if present -- the template's README is deleted
   from projects after bootstrap; any README in a mature project is
   project content)
-* `_working/.gitkeep`, `_archive/.gitkeep` (irrelevant once dirs have
-  content; do not propagate)
+* `_working/.gitkeep`, `_archive/.gitkeep`, `_attic/.gitkeep`
+  (irrelevant once dirs have content; do not propagate)
 * `.template-source` (project setting, not template content)
 
 ## Flow

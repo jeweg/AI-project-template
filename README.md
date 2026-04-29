@@ -3,17 +3,17 @@
 A template for AI-assisted projects: a curated knowledge layer that
 survives across chats. Copy this folder to start a new project workspace.
 
-> Setup documentation. Once your `STATE.md` has been bootstrapped and you no
-> longer need to refer to this file, delete it -- it is template scaffolding,
-> not project content. The rest of this README explains the structure and how
-> to work with it; the bootstrap skill will offer to delete this file once
-> setup completes.
-
-Developed and used in Cursor; designed to also work with Claude Code, OpenAI
+Developed and used in Cursor; designed to also work with Claude Code, 
 Codex CLI, and any other agent tool that reads `AGENTS.md` or `CLAUDE.md` at
-the workspace root (most modern ones do). Only Cursor is verified at present.
-See "Tool compatibility" under Design Principles for adapting to a tool that
-does not.
+the workspace root (most modern ones do).
+
+> [!TIP]
+> TLDR: copy this folder, open an AI chat, and tell the agent what you want
+> to work on. That's it. The first agent will likely offer to bootstrap `STATE.md`
+> and ask what it needs to know; let it. The structure described below grows from
+> there naturally.
+> You can stop reading at this point and still use the template competently -- 
+> the rest of this README is for when you want to understand the design.
 
 
 ## Contents
@@ -39,13 +39,6 @@ start from scratch, but are afraid of losing buried insights.
 
 This template provides a structure that separates raw exploration from curated
 understanding, so you can work messily without losing clarity.
-
-TL;DR: copy this folder, open an AI chat, and tell the agent what you want
-to work on. That's it. The first agent will likely offer to bootstrap `STATE.md`
-and ask what it needs to know; the structure described below grows from
-there. You can stop reading at this point and still use the template
-competently -- the rest of this README is for when you want to understand
-the design.
 
 
 ## Core Concepts

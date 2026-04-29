@@ -308,17 +308,23 @@ evaporate when the chat ends.
 
 ### Tool compatibility
 
-The core system is tool-agnostic. AGENTS.md is plain markdown that any LLM can
-read. The tool-specific pieces are:
+`AGENTS.md` is the convergent standard for agent instructions and is what
+this template treats as canonical. Tools that read it natively work with no
+extra setup; tools that don't get a small pointer file that forces the
+redirect.
 
-* `.cursor/rules/` -- Cursor auto-loads these into every chat. Other tools ignore
-  them.
-* `.cursor/skills/` -- Cursor's progressive disclosure system. The bootstrapping
-  procedure lives here. Other tools reach it via the pointer in AGENTS.md.
-* `CLAUDE.md` -- Claude reads this file by convention. It points to AGENTS.md.
-
-To adapt this template to a different tool, add that tool's equivalent of
-"always read AGENTS.md first" in whatever mechanism the tool provides.
+* Cursor: reads `AGENTS.md` natively, auto-loads `.cursor/rules/` into
+  every chat, and discovers `.cursor/skills/` on demand. No extra setup.
+* Codex CLI (OpenAI): reads `AGENTS.md` natively, walking from the
+  project root upward, plus a global `~/.codex/AGENTS.md` if present. No
+  extra setup.
+* Claude Code (Anthropic): does not read `AGENTS.md` natively as of 2026;
+  reads `CLAUDE.md` by convention. The template ships a small `CLAUDE.md`
+  that exists solely to force Claude to read `AGENTS.md` first. When
+  Anthropic adds native `AGENTS.md` support (open feature request),
+  `CLAUDE.md` becomes removable.
+* Other tools: add the equivalent of "always read `AGENTS.md` first" in
+  whatever mechanism the tool provides.
 
 ### When to add skills vs. keep instructions in AGENTS.md
 

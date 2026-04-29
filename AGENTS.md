@@ -61,6 +61,32 @@ directory and its run command is plenty.
 
 ---
 
+## Template-Controlled Files
+
+These files are owned by the template, not by the project:
+
+* `AGENTS.md` (this file)
+* `CLAUDE.md`
+* All files under `.cursor/rules/`
+* All files under `.cursor/skills/bootstrap-workspace/`
+* All files under `.cursor/skills/update-from-template/`
+
+Changes flow template -> projects only, applied via the
+`update-from-template` skill (which reads the source location from
+`.template-source` at the project root). Do not edit these files
+locally inside a project. Project-side edits are treated as violations
+on the next sync, and the migrating agent will propose lifting the
+content to its proper home (`STATE.md`, `IDENTITY.md`, etc.) before
+overwriting the tracked file.
+
+If you discover during project work that something should change in any
+of these files, change it in the template (the source named in
+`.template-source`), then run the `update-from-template` skill in this
+project to pull the change in. This keeps every project consistent and
+makes the template the single point of evolution.
+
+---
+
 ## Knowledge Layer Tiers
 
 ### What goes where

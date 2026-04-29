@@ -1,0 +1,8 @@
+# Source for the AI workspace template. The update-from-template skill
+# reads this file to know where to pull updates from.
+# Format: first non-empty, non-comment line wins.
+# Value: a git URL (cloned shallowly to a temp dir) or a local
+# filesystem path (read directly).
+# Edit this file if you fork the template or maintain a different
+# authoritative source.
+https://github.com/jeweg/AI-project-template.git

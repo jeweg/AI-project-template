@@ -63,9 +63,9 @@ default. See "Beyond STATE.md" below.
 
 1. Copy this template folder to a new location.
 2. Open it in your editor (Cursor, VS Code, or similar).
-3. If this workspace analyzes an external codebase, add the paths to AGENTS.md
-   (or mention them when you tell the AI about the project in step 4) so the AI
-   can read the relevant code.
+3. If this workspace analyzes an external codebase, note the paths and mention
+   them when you tell the AI about the project in step 4 -- they will go into
+   STATE.md.
 4. Start a chat. The AI will notice that STATE.md does not exist and offer to
    create one based on what you tell it about the project. The initial STATE.md
    will include a Hot List, a Purpose section, Open Questions, and Action Items
@@ -78,70 +78,27 @@ default. See "Beyond STATE.md" below.
 
 ## Day-to-Day Workflow
 
-### Exploring
+Work in chats as usual. The agent updates STATE.md directly with clean
+operational findings and drops a dated `_working/` file (e.g.
+`2026-03-09-memory-layout-notes.md`) for preliminary or session-handoff
+material. Most of this happens without direction; the prompts below are for
+when you want to drive something specific.
 
-Work in chats as usual. When the AI produces findings, the default for clean
-operational content is to update STATE.md directly -- add to an existing section
-or create a new one. This keeps the curated knowledge layer current as you go.
+* "consolidate these working files into STATE.md" (name them, or say
+  "everything about topic X") -- the agent rewrites affected sections and
+  tells you which files are now fully absorbed.
+* "audit state" (or "audit identity" / "audit vision") -- the agent checks
+  for contradictions, stale freshness dates, dead references, and whether
+  the Hot List still matches reality. It reports without silently rewriting.
+* "wrap up the session" or "write a handoff" -- the agent dumps findings and
+  open questions to a `_working/` file before context runs out. Agents are
+  supposed to do this proactively when context is filling; ask if a session
+  ends without one and you noticed.
 
-Use a working file in `_working/` when a finding is preliminary (you are still
-exploring, the conclusion might change), when it is a session summary or
-handoff for future agents, or when you need a staging area before synthesis.
-Working files exist primarily to preserve knowledge across short-lived agent
-sessions; err toward dumping when in doubt -- lost knowledge costs more than
-a messy file. They are dated by convention (e.g.
-`2026-03-09-memory-layout-notes.md`) so you can tell them apart later.
-
-### Consolidating
-
-If you have been using working files, consolidate when an aspect becomes clear --
-you have figured something out, a question is answered, a decision is made:
-
-* Tell the AI: "consolidate these working files into STATE.md" (name the files,
-  or say "everything about topic X").
-* The AI reads the working files, identifies what is new relative to STATE.md,
-  rewrites the relevant section(s), and tells you which files are now absorbed.
-* Move absorbed files to `_archive/`. Or delete them -- they have served their
-  purpose. The AI keeps `_working/INDEX.md` in sync, dropping entries for files
-  that have left `_working/`.
-
-You do not need to consolidate everything at once. One aspect at a time is fine.
-Aspects still in progress stay as working files until they mature.
-
-### Starting Fresh (Without Actually Starting Fresh)
-
-When the urge hits to reorganize from scratch, resist copying everything into a
-new folder. Instead:
-
-* Rewrite the sections of STATE.md that feel stale. This is "starting fresh"
-  for those aspects.
-* Archive the working files that fed those sections.
-* Leave in-progress aspects untouched.
-
-This gives you the psychological reset without the information loss.
-
-### Auditing
-
-After a break, or when STATE.md has grown and you are not sure it is all still
-accurate, ask the AI to audit it ("audit state" or "review state" -- or
-"audit identity" / "audit vision" if those exist). It will check for internal
-contradictions, stale freshness dates, dead code references, and whether the
-Hot List still matches reality. It reports what it finds without silently
-rewriting -- you decide what to fix.
-
-### When Context Runs Out in a Chat
-
-Before abandoning a long chat:
-
-* Ask the AI to summarize its key findings and open questions.
-* Have it write that summary to a working file or directly update STATE.md.
-* Start a new chat. The AI will pick up STATE.md and the project rules
-  automatically -- no need to re-explain the project from scratch.
-
-The AI is supposed to do this without being asked too -- when you signal you
-are wrapping up, when context is filling, or when work has produced findings
-that have not landed in STATE.md, the agent drops a `_working/` handoff file
-on its own. If a session ends without one and you notice, ask for it.
+When the urge hits to reorganize from scratch, resist copying everything into
+a new folder. Instead, rewrite the stale STATE.md sections, archive the
+working files that fed them, and leave in-progress aspects untouched. Same
+psychological reset, no information loss.
 
 
 ## Beyond STATE.md: Identity and Vision
@@ -159,61 +116,22 @@ root:
 
 The three together form the knowledge layer, each with a distinct role and
 update cadence: STATE every session, IDENTITY when the worldview shifts (rare),
-VISION when reflection produces durable new ambitions (occasional).
+VISION when reflection produces durable new ambitions (occasional). If a
+project has IDENTITY but no VISION, that is fine; the reverse is a smell --
+vision without grounded identity tends to drift, so add IDENTITY first.
 
-### When to introduce them
-
-`IDENTITY.md` becomes useful when:
-
-* The STATE.md Hot List keeps growing past 5 bullets because architectural
-  framing is bleeding into operational state.
-* You catch yourself re-explaining the same Purpose / Design Summary sections
-  to every new agent. That content has crystallised; lift it.
-* Multiple agents work on the project in parallel and need a stable reference
-  for "what this project is" that does not get edited every session.
-
-`VISION.md` becomes useful when:
-
-* Brainstorming or reflection sessions produce ambitions that fit neither
-  STATE (operational) nor any single design doc (too narrow).
-* The project has aspirations beyond the immediate roadmap that are worth
-  preserving and would otherwise be forgotten as you cycle on day-to-day work.
-
-If a project has IDENTITY but no VISION, that is fine. If a project has VISION
-but no IDENTITY, that is a smell -- vision without grounded identity tends to
-drift. Add IDENTITY first.
-
-### How to introduce them
-
-There is deliberately no bootstrap skill or template skeleton for these files.
-Their internal structure is project-specific -- the sections that fit one
-project's identity will not fit another's -- so a portable skeleton would
-either prescribe wrong shapes or be so thin as to be useless. A bootstrap
-skill would also create an invocation surface that nudges agents toward
-creating these files prematurely, defeating the earned-over-time model.
-
-The introduction is conversational. Tell the AI:
-
-* "lift the architectural sections of STATE.md into a new IDENTITY.md", or
-* "we have enough vision-shaped material in `_working/`; create VISION.md
-  from it"
-
-The AI extracts the relevant content, writes the new file with sections that
-fit the project, leaves cross-references in STATE.md, and updates AGENTS.md
-context if helpful. Each knowledge layer file should open with a short preamble
-pointing at the others (whichever exist), so a reader landing on any one knows
-where to find the rest. After the lift, re-examine the STATE.md Hot List -- it
-usually shrinks back below the 5-bullet line because architectural framing is
-no longer cluttering it.
-
-Note on freshness markers: STATE.md uses per-section markers (one per heading)
-because its sections are rewritten independently. IDENTITY.md and VISION.md
-use a single top-level marker on the document title, because the worldview and
-ambitions tend to evolve as a whole; bump the title's marker on any
-substantive edit.
+The agent watches for the cues that justify introducing these (architectural
+content bleeding into the STATE.md hot list, vision-shaped material accumulating
+across working files) and proposes the lift when warranted. You can also
+trigger it directly: "lift the architectural sections of STATE.md into a new
+IDENTITY.md" or "we have enough vision-shaped material in `_working/`; create
+VISION.md from it."
 
 
 ## What Goes Where
+
+The agent handles routing automatically; this list is just for orientation if
+you want to know where things end up.
 
 * Findings, answered questions, decisions --> STATE.md (rewrite sections, update
   freshness markers, re-examine the Hot List). This is the default destination.
@@ -231,8 +149,8 @@ substantive edit.
 * Consumed working files --> `_archive/` (the user moves them; the agent
   surfaces which are absorbed and updates the INDEX). Or just delete.
 * Rules the AI should always follow --> `.cursor/rules/`
-* External codebase paths and project-specific AI instructions (when the
-  workspace analyzes code that lives elsewhere) --> AGENTS.md
+* External codebase paths (when the workspace analyzes code that lives
+  elsewhere) --> STATE.md (or IDENTITY.md when it exists)
 
 
 ## Relationship to Karpathy's "LLM Wiki" Pattern
@@ -409,12 +327,6 @@ introduction is conversational instead, with the rule documented in AGENTS.md.
 
 ## Tips
 
-* Don't over-organize `_working/`. The whole point is that it is allowed to be
-  messy. You will consolidate later.
-* STATE.md sections do not need to be long. A few sentences per aspect is fine
-  early on. They grow and get rewritten as understanding deepens.
-* If you find yourself wanting multiple STATE.md files, that is a signal that
-  you have multiple projects and should split into separate workspaces.
 * Back up your workspace folder periodically. Cursor stores chat transcripts in
   your home directory (`%USERPROFILE%\.cursor\projects\`), not in the workspace.
   If you want to preserve chat history too, back up that location as well.
@@ -424,5 +336,3 @@ introduction is conversational instead, with the rule documented in AGENTS.md.
   shorter summary in `_working/`. The summary is what agents will find via the
   index and use day-to-day. The full transcript stays available in case you need
   to look up a specific quote, exact wording, or a detail the summary missed.
-  This way nothing is lost, but the material agents actually work with stays
-  compact and focused.

@@ -92,6 +92,13 @@ default. See "Beyond STATE.md" below.
 
 ## Optional: LF-only Line Endings
 
+`_template/` contains optional template-maintenance helpers and metadata.
+It is not project content. You can delete it from a derived project if
+you do not want template-update or LF-policy helpers; the core workspace
+still works with `AGENTS.md`, `STATE.md`, and the working-file
+conventions. Keeping `_template/` just makes future template syncs and
+optional setup tasks easier.
+
 The template is neutral by default and does not force a line-ending
 policy. If you want a derived repository to be LF-only, run:
 

@@ -5,7 +5,7 @@ description: >-
   update / sync / migrate from the template, to pull in template changes, or
   when template-controlled files (AGENTS.md, CLAUDE.md, .cursor/rules,
   bootstrap skill) appear stale relative to the source. Reads the source
-  location from .template-source at the project root.
+  location from _template/template-source at the project root.
 ---
 
 # Update from Template
@@ -29,7 +29,7 @@ the template-controlled scaffolding current as the template evolves.
 
 ## Inputs
 
-Read `.template-source` at the project root.
+Read `_template/template-source` at the project root.
 
 * Format: first non-empty, non-comment line wins. Comments start with `#`.
 * Value: either a git URL or a local filesystem path.
@@ -51,9 +51,9 @@ Before any other work:
   `bootstrap-workspace` skill instead.
 * The resolved source must contain `AGENTS.md`. If not, the source is
   not a template -- STOP and tell the user.
-* If `.template-source` is a URL and `git` is not available, STOP and
-  suggest installing git or pointing `.template-source` at a local
-  filesystem path.
+* If `_template/template-source` is a URL and `git` is not available,
+  STOP and suggest installing git or pointing `_template/template-source`
+  at a local filesystem path.
 
 ## Project folders
 
@@ -78,6 +78,7 @@ Owned by the template:
 * All files under `.cursor/rules/`
 * All files under `.cursor/skills/bootstrap-workspace/`
 * All files under `.cursor/skills/update-from-template/` (this skill)
+* `_template/.gitignore`
 * `_template/line-endings.md`
 * `_template/apply-lf-policy.py`
 
@@ -91,9 +92,14 @@ NOT touched (project-owned content):
   project content)
 * `_working/.gitkeep`, `_archive/.gitkeep`, `_attic/.gitkeep`
   (irrelevant once dirs have content; do not propagate)
-* `.template-source` (project setting, not template content)
+* `_template/template-source` (project-local template source setting)
 * `.gitattributes` and `.editorconfig` (project policy files, created only
   when the user opts in to the LF-only policy)
+
+`_template/` is optional helper material. If a project deleted it on
+purpose, do not treat that as a broken workspace; report that template
+sync / LF-policy helpers are unavailable unless the user wants them
+restored.
 
 ## Flow
 

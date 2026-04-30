@@ -77,12 +77,13 @@ These files are owned by the template, not by the project:
 * All files under `.cursor/rules/`
 * All files under `.cursor/skills/bootstrap-workspace/`
 * All files under `.cursor/skills/update-from-template/`
+* `_template/.gitignore`
 * `_template/line-endings.md`
 * `_template/apply-lf-policy.py`
 
 Changes flow template -> projects only, applied via the
 `update-from-template` skill (which reads the source location from
-`.template-source` at the project root). Do not edit these files
+`_template/template-source` at the project root). Do not edit these files
 locally inside a project. Project-side edits are treated as violations
 on the next sync, and the migrating agent will propose lifting the
 content to its proper home (`STATE.md`, `IDENTITY.md`, etc.) before
@@ -90,9 +91,17 @@ overwriting the tracked file.
 
 If you discover during project work that something should change in any
 of these files, change it in the template (the source named in
-`.template-source`), then run the `update-from-template` skill in this
+`_template/template-source`), then run the `update-from-template` skill in this
 project to pull the change in. This keeps every project consistent and
 makes the template the single point of evolution.
+
+`_template/template-source` itself is project-local configuration, not
+template-controlled content. Edit it when a project intentionally tracks
+a fork or local template checkout.
+
+`_template/` is optional helper material. A project may delete it if it
+does not want template-update or LF-policy helpers; the core workspace
+contract still lives in `AGENTS.md`, the curated layer, and `_working/`.
 
 `.gitattributes` and `.editorconfig` are deliberately not template-
 controlled. They are project policy files created only when a derived

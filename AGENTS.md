@@ -285,9 +285,10 @@ knowledge layer files, and handoff working files.
 `STATE.md`-specific rule:
 
 * Hot list. `STATE.md` starts with a `## Hot List` section
-  immediately after any preamble. This is a short (max 5 bullet
-  points) summary of the most important facts and priorities right
-  now. Bullets should be terse -- one or two lines each, a headline
+  immediately after any preamble. This is a short (typically ~5
+  bullets) summary of the most important facts and priorities right
+  now. The number is a heuristic for spotting trouble, not a hard
+  cap. Bullets should be terse -- one or two lines each, a headline
   plus pointers (to action items, design docs, working files), not
   full status paragraphs. If a bullet keeps growing, content has
   crept in from another section; lift the detail to its proper home
@@ -295,9 +296,9 @@ knowledge layer files, and handoff working files.
   `STATE.md`, also re-examine the hot list and rewrite it if the
   update changes what matters most. The hot list must always be
   current -- it is the first thing a reader (human or AI) sees. If
-  the hot list keeps growing past 5 bullets, the cause is usually
-  that architectural identity is bleeding into operational state;
-  that is a signal to introduce `IDENTITY.md` and lift the
+  the hot list keeps drifting well past ~5 bullets, the cause is
+  usually that architectural identity is bleeding into operational
+  state; that is a signal to introduce `IDENTITY.md` and lift the
   architectural content out.
 
 ### Session-end handoff
@@ -415,7 +416,7 @@ standard git commit guidance:
   knowledge layer, say which sections overlap and whether the working
   file adds anything beyond what is already captured. This prevents
   working files from silently accumulating redundant material.
-* If `STATE.md` is consistently exceeding the 5-bullet hot list rule
+* If `STATE.md`'s hot list keeps drifting well past ~5 bullets
   because architectural content keeps showing up there, suggest
   introducing `IDENTITY.md` and lifting that content out.
 * If brainstorm-shaped content keeps accumulating across working

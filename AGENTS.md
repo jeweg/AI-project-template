@@ -199,6 +199,15 @@ When a count IS informative, name what it counts
 ("12 new idempotency tests added; suite green"). Applies to commits,
 knowledge layer files, and handoff working files.
 
+### Local file operations
+
+Local file operations (Read, Write, StrReplace, Edit) are cheap. Do
+not batch them, avoid them, or stage findings in chat awaiting
+permission to write them. Read multiple files in parallel when
+relevant; write files when you have content to write. The "minimize
+tool calls" instinct applies to MCP tools and external shell
+commands, not to local file work.
+
 ### When producing findings or insights
 
 * When a finding is clean and operational, update `_agents/STATE.md`
@@ -221,13 +230,14 @@ knowledge layer files, and handoff working files.
   summary or handoff for future agents, when it captures context
   another agent should not have to rediscover, or when you need a
   staging area before synthesis.
-* When in doubt, drop a working file. Working files exist primarily
-  to preserve knowledge across short-lived agent sessions -- lost
-  knowledge is more expensive than a messy file.
-* Whenever you create a file (in `_agents/working/` or anywhere
-  else), name the file in your reply and summarise its contents in a
-  sentence or two so the user knows it exists. Never silently create
-  files outside `_agents/working/` without confirming.
+* Capture in the same turn as you produce the finding. Do not
+  present analysis and ask "shall I write this up?" -- write the
+  file and announce it in the same reply. Objection is cheaper
+  than missed capture.
+* Inside `_agents/working/`: create freely; name the file and
+  summarise its contents in a sentence or two in the same reply.
+* Outside `_agents/working/`: never create or move a file without
+  explicit confirmation.
 
 ### When updating knowledge layer files
 

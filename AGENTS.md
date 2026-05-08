@@ -1,4 +1,4 @@
-# Agents Rules
+ Agents Rules
 
 ## Workspace Structure
 
@@ -55,12 +55,11 @@ Working material (under `_agents/`):
 Project context:
 
 * `README.md` -- If the workspace was started from the AI workspace
-  template, the initial `README.md` is the template's setup
-  documentation, not project content. Ignore it during normal
-  operation. If it still exists and the project already has a
-  `_agents/STATE.md`, suggest to the user that it can be deleted (its
-  banner near the top says the same). Once it is deleted, a future
-  `README.md` is project content like any other file.
+  template, the initial `README.md` is template setup documentation,
+  not project content. Ignore it during normal operation. If it still
+  exists alongside `_agents/STATE.md`, suggest deleting it (its top
+  banner says the same). After deletion, a future `README.md` is
+  project content like any other file.
 
 Implementation directories (project-specific) sit at the workspace
 root alongside `_agents/`. Project layout, build / run / test
@@ -185,9 +184,8 @@ When writing Markdown files, default to these rules:
   visible.
 * Do not use text styles like bold or italic.
 * Do not use non-ASCII characters like em-dash, arrow glyphs, etc.
-  Use ASCII representations like `-`, `--`, `->`, `<->`.
-* No Unicode glyphs outside ASCII, except when quoting text that uses
-  them.
+  Use ASCII representations like `-`, `--`, `->`, `<->`. Exception:
+  when quoting text that uses Unicode glyphs.
 * If both list (bullet points) and tables are equally suitable,
   prefer a list.
 
@@ -273,11 +271,7 @@ commands, not to local file work.
   and leave a pointer. Every time you update any section of
   `_agents/STATE.md`, also re-examine the hot list and rewrite it if
   the update changes what matters most. The hot list must always be
-  current -- it is the first thing a reader (human or AI) sees. If
-  the hot list keeps drifting well past ~5 bullets, the cause is
-  usually that architectural identity is bleeding into operational
-  state; that is a signal to introduce `_agents/IDENTITY.md` and
-  lift the architectural content out.
+  current -- it is the first thing a reader (human or AI) sees.
 
 ### Session-end handoff
 

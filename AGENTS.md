@@ -472,12 +472,6 @@ bootstrap the workspace before doing other operational work:
    New Workspace"), suggest to the user that it can be deleted now
    that the workspace is set up. Do not delete a `README.md` whose
    content is project documentation.
-6. If the user wants an LF-only repository, point them at the
-   "Optional: LF-only Line Endings" section in the template's
-   `README.md` and offer to run `python _knowledge/apply-lf-policy.py`.
-   Do not apply the policy silently; `.gitattributes` and
-   `.editorconfig` are project policy files, not public-template
-   defaults.
 
 Do not add bootstrap procedures for `_knowledge/IDENTITY.md` or
 `_knowledge/VISION.md`. They are introduced manually as the project

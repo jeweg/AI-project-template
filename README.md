@@ -18,11 +18,7 @@ without anyone having to remember it was said.*
 context. The agent flags conflicts from materials and identity
 before any code is written.*
 
-Copy this folder into a project to start.
-
-Developed and used in Cursor; designed to also work with Claude Code, 
-Codex CLI, and any other agent tool that reads `AGENTS.md` or `CLAUDE.md` at
-the workspace root (most modern ones do).
+Copy this folder into a project to start. Compatible with Cursor, Claude Code, and Codex App and CLI.
 
 > [!TIP]
 > TLDR: copy this folder, feel free to delete `README.md` and the

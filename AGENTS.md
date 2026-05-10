@@ -168,6 +168,19 @@ are the persistence mechanism that prevents knowledge loss between
 agents. Treat both as continuous responsibilities, not periodic
 cleanup tasks.
 
+Knowledge coherence is part of normal edits, not only an audit
+task. When you touch a curated file or a materials file, do a
+local coherence pass before finishing the turn: re-read the
+specific sections and cross-references you touched, and check
+`_knowledge/materials/INDEX.md` when materials membership changed.
+Fix obvious bookkeeping drift directly -- a stale `INDEX.md` entry
+pointing at a file no longer in `_knowledge/materials/`, a cross-
+reference to a renamed or moved section, a freshness marker that
+contradicts the actual update. If the right fix would require
+interpreting content or changing meaning, flag it instead of
+guessing. The trigger is local evidence encountered during normal
+work; do not expand this into a full audit unless the user asks.
+
 `_knowledge/IDENTITY.md` and `_knowledge/VISION.md` exist only when the
 project has earned them; do not create them eagerly. When they exist,
 route findings to whichever file's role they fit (see "What goes
@@ -337,9 +350,13 @@ Creating and updating materials:
   must also update its entry in `_knowledge/materials/INDEX.md`. This is
   not optional -- the index is how future agents find relevant
   material. A file without an index entry is invisible.
-* When a materials file is moved to `_knowledge/archive/`, remove its
-  entry from `INDEX.md`. The index should only list files that are
-  currently in `_knowledge/materials/`.
+* When a materials file leaves `_knowledge/materials/` -- moved to
+  `_knowledge/archive/`, parked in `_knowledge/attic/`, deleted, or
+  renamed -- remove or update its entry in `INDEX.md`. The index
+  should only list files currently in `_knowledge/materials/`. This
+  applies whether you performed the move yourself or noticed
+  afterwards that the user or a past agent did; do not wait for an
+  audit prompt.
 * The entry format is:
 
 ```
@@ -399,6 +416,17 @@ standard git commit guidance:
   content out.
 * If brainstorm-shaped content keeps accumulating across materials
   without an obvious home, suggest introducing `_knowledge/VISION.md`.
+* If you notice a materials file referenced by
+  `_knowledge/materials/INDEX.md` is no longer in
+  `_knowledge/materials/`, treat the index as out of date and repair
+  it the moment you see it -- not only during an audit. Remove the
+  entry if the file has moved to `_knowledge/archive/` (insights
+  absorbed) or `_knowledge/attic/` (parked work, not surfaced
+  proactively). If the file has simply vanished with no trace in
+  archive or attic, ask the user before deleting the entry. Apply
+  the same logic to cross-references in `_knowledge/STATE.md`,
+  `_knowledge/IDENTITY.md`, or `_knowledge/VISION.md` that point at
+  a moved or missing file.
 
 ### Auditing knowledge layer files
 

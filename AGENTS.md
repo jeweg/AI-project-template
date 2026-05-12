@@ -550,15 +550,23 @@ When the user asks to commit, push, or otherwise capture changes in
 git -- in any phrasing -- two rules apply on top of the system's
 standard git commit guidance:
 
-* Commit only your own scope. Stage only files YOU edited or
-  created in this session, tracked from your own tool-call history.
-  Other agents or background tools may have modified files
-  concurrently; those are out of scope and stay unstaged. Never use
-  `git add .`, `git add -A`, or `git commit -a` -- they sweep up
-  out-of-scope changes. If `git status` shows changes you did not
-  make, name them in your reply (so the user knows they are still
-  pending) but leave them alone. If you cannot reconstruct your
-  scope confidently, ask; do not guess from the diff.
+* Default to committing only your own scope. Stage only files YOU
+  edited or created in this session, tracked from your own tool-call
+  history. Other agents or background tools may have modified files
+  concurrently; by default those are out of scope and stay unstaged.
+  If `git status` shows changes you did not make, name them in your
+  reply so the user knows they are still pending. If you cannot
+  reconstruct your scope confidently, ask; do not guess from the diff.
+
+* The user may explicitly override commit scope. If the user says to
+  "commit all", "commit everything", "include unrelated changes", or
+  otherwise clearly asks for the whole current worktree, treat that
+  as authorization to stage and commit all non-ignored changes in the
+  repo. In that mode, first give a concise status summary, then use
+  broad staging such as `git add -A` if appropriate. Do not include
+  ignored files unless the user names them explicitly. Still stop and
+  ask before committing obvious secrets, credentials, dependency
+  directories, build caches, or unexpectedly large binaries.
 
 * Chain related git commands into single compound shell calls.
   - Pre-flight inspection: one call covering status, diff for the

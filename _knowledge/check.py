@@ -32,11 +32,16 @@ Checks performed:
   (`_knowledge/STATE.md` and `_knowledge/materials/OVERVIEW.md`):
   flags if the sentinel banner is still present (unbootstrapped),
   or, if the banner is gone, flags any remaining `<...>` placeholder
-  text or literal `YYYY-MM-DD` markers (broken bootstrap). Missing
-  files are flagged with a recovery hint.
+  text or literal `YYYY-MM-DD` markers (broken bootstrap), with the
+  line numbers where they occur. Missing files are flagged with a
+  recovery hint. Code blocks are excluded from the placeholder scan
+  so language generics like `Map<String, Integer>` do not trip it.
 * `INDEX.md` membership: every working file in `_knowledge/materials/`
-  has a `## <filename>` entry, and every entry points at a file
-  that exists. Reports missing entries and stale entries.
+  has a `## <filename>` entry, and every entry points at a file that
+  exists. Only `## <filename>.md` headings are treated as entries, so
+  notes and preambles in `INDEX.md` are not mistaken for stale
+  entries. Reports missing entries, stale entries, duplicate entries,
+  and any subdirectories under `materials/` (the namespace is flat).
 
 Run from any directory inside the project; the script walks up to
 find the `_knowledge/` directory.
@@ -60,18 +65,23 @@ INDEX_PATH = "_knowledge/materials/INDEX.md"
 MATERIALS_DIR = "_knowledge/materials"
 CANONICAL_MATERIALS_FILES = frozenset({"INDEX.md", "OVERVIEW.md"})
 
-# Match `<...>` placeholders containing whitespace, including
-# placeholders that span multiple lines (newlines allowed inside
-# the brackets). Every template skeleton placeholder contains at
-# least one space, so the whitespace requirement is sufficient and
-# prose forms like `<name>` or `<thing>` (single-token, no
-# whitespace) are not false-positive flagged. Nested `<...<...>...>`
-# is rejected because `[^<>]` excludes inner brackets. The skeleton
-# is deliberately authored without single-token placeholders so
-# this regex does not need any special cases.
-PLACEHOLDER_RE = re.compile(r"<[^<>]*\s[^<>]*>")
+# Match `<...>` placeholders containing whitespace. Every template
+# skeleton placeholder contains at least one space, so the whitespace
+# requirement is sufficient and single-token prose forms like `<name>`
+# or `<thing>` are not flagged. Brackets containing `=` or `"` are
+# excluded so HTML attributes like `<img src="x" alt="y">` and similar
+# tag-shaped content do not trip the check. Code blocks (fenced and
+# inline) are blanked out before this regex runs, so language generics
+# like `Map<String, Integer>` inside code samples do not match either;
+# see `_strip_code_for_placeholder_check`.
+PLACEHOLDER_RE = re.compile(r'<[^<>="]*\s[^<>="]*>')
 DATE_PLACEHOLDER_RE = re.compile(r"\bYYYY-MM-DD\b")
-INDEX_HEADING_RE = re.compile(r"^##\s+(.+?)\s*$")
+# Index entries name a markdown filename: `## foo.md` or
+# `## 2026-05-14-handoff.md`. Other `##` headings (preambles, notes,
+# meta sections) are not treated as entries. The character class
+# matches the descriptive lowercase filenames the template recommends
+# plus any case the agent might use; the trailing `.md` is required.
+INDEX_HEADING_RE = re.compile(r"^##\s+([\w.\-]+\.md)\s*$")
 
 def recovery_hint(rel_path: str) -> str:
     return (
@@ -95,11 +105,41 @@ def first_non_empty_line(text: str) -> str:
     return ""
 
 
+def _strip_code_for_placeholder_check(text: str) -> str:
+    """Blank out fenced code blocks and inline-code spans so they do not
+    trigger placeholder false positives, while preserving line numbers
+    so finding locations match the original file."""
+    out_lines: list[str] = []
+    in_fence = False
+    for line in text.splitlines():
+        stripped = line.lstrip()
+        if stripped.startswith("```") or stripped.startswith("~~~"):
+            in_fence = not in_fence
+            out_lines.append("")
+            continue
+        if in_fence:
+            out_lines.append("")
+            continue
+        out_lines.append(re.sub(r"`[^`]*`", "", line))
+    return "\n".join(out_lines)
+
+
+def _line_number(text: str, offset: int) -> int:
+    """1-based line number of `offset` in `text`."""
+    return text.count("\n", 0, offset) + 1
+
+
+def _format_locations(line_numbers: list[int]) -> str:
+    if len(line_numbers) == 1:
+        return f"at line {line_numbers[0]}"
+    return "at lines " + ", ".join(str(n) for n in line_numbers)
+
+
 def check_bootstrap(root: Path) -> list[str]:
     findings: list[str] = []
     for rel in PRE_SHIPPED_WITH_BANNER:
         path = root / rel
-        if not path.exists():
+        if not path.is_file():
             findings.append(
                 f"{rel}: missing (template-shipped, expected to be "
                 f"present); {recovery_hint(rel)}"
@@ -111,18 +151,28 @@ def check_bootstrap(root: Path) -> list[str]:
         if banner_present:
             findings.append(
                 f"{rel}: sentinel banner still present (unbootstrapped); "
-                f"interview the user, fill the file, remove the banner"
+                f"use provided context or ask the user, fill the file, "
+                f"remove the banner"
             )
             continue
-        placeholders = PLACEHOLDER_RE.findall(text)
-        unfilled_dates = DATE_PLACEHOLDER_RE.findall(text)
-        if placeholders or unfilled_dates:
+        scrubbed = _strip_code_for_placeholder_check(text)
+        placeholder_lines = sorted(
+            {_line_number(scrubbed, m.start()) for m in PLACEHOLDER_RE.finditer(scrubbed)}
+        )
+        date_lines = sorted(
+            {_line_number(text, m.start()) for m in DATE_PLACEHOLDER_RE.finditer(text)}
+        )
+        if placeholder_lines or date_lines:
             parts: list[str] = []
-            if placeholders:
-                parts.append(f"{len(placeholders)} `<...>` placeholder(s)")
-            if unfilled_dates:
+            if placeholder_lines:
                 parts.append(
-                    f"{len(unfilled_dates)} unfilled `YYYY-MM-DD` marker(s)"
+                    f"{len(placeholder_lines)} `<...>` placeholder(s) "
+                    f"{_format_locations(placeholder_lines)}"
+                )
+            if date_lines:
+                parts.append(
+                    f"{len(date_lines)} unfilled `YYYY-MM-DD` marker(s) "
+                    f"{_format_locations(date_lines)}"
                 )
             findings.append(
                 f"{rel}: banner gone but " + " and ".join(parts)
@@ -132,7 +182,13 @@ def check_bootstrap(root: Path) -> list[str]:
 
 
 def parse_index_entries(text: str) -> list[str]:
-    """Return filenames named in `## <filename>` headings of INDEX.md."""
+    """Return filenames named in `## <filename>.md` headings of INDEX.md.
+
+    Only headings whose text matches a markdown filename are returned.
+    Other `##` sections (preambles, meta notes, etc.) are ignored, so
+    `INDEX.md` may freely contain non-entry sections without polluting
+    the membership check.
+    """
     entries: list[str] = []
     for line in text.splitlines():
         m = INDEX_HEADING_RE.match(line)
@@ -142,13 +198,26 @@ def parse_index_entries(text: str) -> list[str]:
 
 
 def list_working_files(materials_dir: Path) -> list[str]:
-    """List lowercase .md files in `materials/`, excluding canonical artifacts."""
+    """List .md files in `materials/`, excluding canonical artifacts.
+
+    Subdirectories are not returned; they are out of contract for
+    `materials/` and are reported separately by `check_index_membership`.
+    """
     return sorted(
         p.name
         for p in materials_dir.iterdir()
         if p.is_file()
         and p.suffix == ".md"
         and p.name not in CANONICAL_MATERIALS_FILES
+    )
+
+
+def list_materials_subdirs(materials_dir: Path) -> list[str]:
+    """List subdirectory names directly under `materials/`."""
+    return sorted(
+        p.name
+        for p in materials_dir.iterdir()
+        if p.is_dir()
     )
 
 
@@ -162,15 +231,29 @@ def check_index_membership(root: Path) -> list[str]:
             f"{recovery_hint(INDEX_PATH)}"
         )
         return findings
-    if not index_path.exists():
+    for subdir in list_materials_subdirs(materials_dir):
+        findings.append(
+            f"{MATERIALS_DIR}/{subdir}/: subdirectory under materials/ "
+            f"(materials/ is a flat namespace; flatten the file or move "
+            f"it to _knowledge/archive/)"
+        )
+    if not index_path.is_file():
         findings.append(
             f"{INDEX_PATH}: missing; {recovery_hint(INDEX_PATH)}"
         )
         return findings
     working_files = set(list_working_files(materials_dir))
-    index_entries = set(
-        parse_index_entries(index_path.read_text(encoding="utf-8"))
-    )
+    raw_entries = parse_index_entries(index_path.read_text(encoding="utf-8"))
+    seen: dict[str, int] = {}
+    for name in raw_entries:
+        seen[name] = seen.get(name, 0) + 1
+    duplicates = sorted(name for name, count in seen.items() if count > 1)
+    for name in duplicates:
+        findings.append(
+            f"{INDEX_PATH}: entry for `{name}` appears {seen[name]} times "
+            f"(duplicate; keep one entry)"
+        )
+    index_entries = set(raw_entries)
     missing = sorted(working_files - index_entries)
     stale = sorted(index_entries - working_files)
     for name in missing:

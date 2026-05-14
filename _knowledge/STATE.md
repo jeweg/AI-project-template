@@ -1,8 +1,15 @@
-> NOTE: This is template default content. STATE.md is the project's
-> operational state -- what is happening, what is unresolved, what
-> comes next. On first session the agent should ask the user about
-> the project, fill in the sections below, and remove this entire
-> NOTE block. See `AGENTS.md` -> "Bootstrap".
+> NOTE: This is template default content. On first session, replace
+> the placeholders below with real project state. If the user has
+> already provided a handoff, email thread, transcript, design note,
+> or other substantial context, write a materials summary for it,
+> add an `INDEX.md` entry, and reflect the current state here; do
+> not only summarize it in chat. If not, ask what this project or
+> investigation is about.
+> If `materials/` already contains working files, read them first and
+> reflect relevant facts here. Fill all `YYYY-MM-DD` markers with
+> today's date, remove all `<...>` placeholders, and remove this
+> entire NOTE block. Do not introduce `IDENTITY.md` or `VISION.md`
+> during bootstrap. See `AGENTS.md` -> "Bootstrap".
 
 # <Project Name> -- Project State
 

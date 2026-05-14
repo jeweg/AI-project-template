@@ -1,10 +1,15 @@
-> NOTE: This is template default content. OVERVIEW.md is the
-> project's external-facing self-description -- what the project
-> knows, for external agents and MCP servers to discover. On first
-> session the agent should fill the description, keywords, and
-> coverage sections below based on the user's project description,
-> and remove this entire NOTE block. See `AGENTS.md` -> "When
-> updating OVERVIEW.md".
+> NOTE: This is template default content. On first session, replace
+> the placeholders below with an external-facing description of the
+> `materials/` namespace. If the user has already provided a handoff,
+> email thread, transcript, design note, or other substantial context,
+> write a materials summary for it, add an `INDEX.md` entry, and
+> reflect its topic areas here; do not only summarize it in chat. If
+> not, ask what this project or investigation is about. If
+> `materials/` already contains working files, read them first and
+> reflect their topic areas in Keywords and Coverage. Fill the
+> `YYYY-MM-DD` marker with today's date, remove all `<...>`
+> placeholders, and remove this entire NOTE block. See `AGENTS.md` ->
+> "Bootstrap" and "When updating OVERVIEW.md".
 
 # <Project Name> -- Knowledge Base Overview (updated YYYY-MM-DD)
 

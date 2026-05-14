@@ -1,701 +1,431 @@
-# Agents Rules
+# Agent Rules
+
+## Purpose
+
+This workspace is organized to preserve project knowledge across short-lived
+agent sessions.
+
+The agent's primary job is to keep useful understanding from living only in
+chat. Capture findings, maintain the current state, and keep the materials
+index discoverable.
+
+## Non-Negotiable Invariants
+
+* Read `_knowledge/STATE.md` first for non-trivial work.
+* Capture durable findings in the same turn; do not leave them only in chat.
+* Treat substantial handoffs, transcripts, email threads, and design notes as
+  durable context; summarize them into `materials/`, not only chat.
+* Store project memory in `_knowledge/`, not in tool-private memory stores.
+* Treat `STATE.md`, `IDENTITY.md`, and `VISION.md` as authoritative over
+  materials unless the user says otherwise.
+* Update `INDEX.md` whenever materials are created, renamed, moved, or
+  substantially updated.
+* Update `OVERVIEW.md` when the shape of `materials/` changes.
+* Do not create `IDENTITY.md` or `VISION.md` eagerly.
+* Do not move files into `_knowledge/archive/` unless the user asks; list
+  archive candidates instead.
+* Keep audit, consolidation, and mechanical validation distinct.
 
 ## Workspace Structure
 
-This workspace is organized for knowledge management around an evolving
-project.
+Project memory lives under `_knowledge/` at the workspace root. It has two
+layers with different audiences:
 
-Project memory lives under `_knowledge/` at the workspace root. It holds
-two layers with different audiences:
+* Curated layer: `_knowledge/STATE.md`, plus, when the project has earned them:
+  `_knowledge/IDENTITY.md` and `_knowledge/VISION.md`. These files are the
+  project's internal scaffolding: current state, posture, commitments, and
+  ambition. They are not external-facing.
+* Materials layer: `_knowledge/materials/`. This is the project's knowledge
+  namespace: notes, explorations, session bridges, source summaries, and, for
+  knowledge-heavy projects, durable reference artifacts that may be the
+  project's deliverable.
 
-* The curated layer -- `STATE.md`, plus `IDENTITY.md` and `VISION.md`
-  when introduced. The project's internal scaffolding: operational
-  state, posture, ambition. Meta about the project, for the project's
-  own agents and contributors. Not exposed externally.
-* The materials layer -- `_knowledge/materials/`. The project's
-  knowledge namespace: working notes, exploration, session bridges,
-  and (for knowledge-heavy projects) durable knowledge artifacts
-  that may be the project's deliverable. Holds both lowercase-named
-  working files and UPPERCASE canonical artifacts (`INDEX.md`,
-  `OVERVIEW.md`) that describe and announce the namespace; the
-  contents themselves are not externally exposed by default.
+Product code, scripts, documents, or other project deliverables sit beside
+`_knowledge/` in whatever shape the project needs. In knowledge-heavy projects,
+the deliverable may itself live under `_knowledge/materials/`; that is the
+design point, not a structural violation.
 
-The repository's product code or other deliverables sit alongside
-`_knowledge/` under whatever shape the project calls for. For
-knowledge-heavy projects, the deliverable may itself live inside
-`_knowledge/materials/`; that is the design point, not a violation
-of the structure.
+### Curated Layer
 
-Curated knowledge layer (under `_knowledge/`):
+* `_knowledge/STATE.md` is always present. It records what is happening now:
+  hot list, in-flight work, unresolved questions, action items, and decisions
+  whose rationale is still being absorbed. Rewrite sections as understanding
+  matures; do not append stale update trails.
+* `_knowledge/IDENTITY.md` is optional. It records what the project is:
+  purpose, mental model, architecture, posture, conventions, and constraints
+  that should not be renegotiated casually.
+* `_knowledge/VISION.md` is optional. It records where the project is heading:
+  long-term capabilities, reframes, moon shots, and ambitions worth preserving
+  without forcing them into the active roadmap.
 
-* `_knowledge/STATE.md` (always present) -- Current operational state.
-  What is in flight, what is unresolved, what comes next. Sections are
-  rewritten as understanding matures, never merely appended to.
-  Touched every session that produces operational findings.
-* `_knowledge/IDENTITY.md` (optional; introduced for larger / longer-lived
-  projects) -- What the project IS. Purpose, architectural
-  commitments, posture, non-negotiables. Slow-changing.
-* `_knowledge/VISION.md` (optional; introduced for larger / longer-lived
-  projects) -- Where the project is HEADING. Long-term capabilities,
-  reframes, moon shots, what the substrate or design enables that has
-  not yet been built. Updated occasionally.
+Do not create `IDENTITY.md` or `VISION.md` eagerly. Introduce them when the
+project has stable content that would otherwise keep being re-explained from
+`STATE.md` or scattered materials.
 
-Materials layer (under `_knowledge/`):
+If `VISION.md` exists without `IDENTITY.md`, that is a smell. Vision without a
+grounded identity tends to drift; introduce `IDENTITY.md` first.
 
-* `_knowledge/materials/` -- The project's knowledge namespace.
-  Contains two kinds of files:
+Each curated file should open with a short preamble pointing at the other
+curated files that exist. `STATE.md` points at `IDENTITY.md`, `VISION.md`, and
+any canonical design material when present. `IDENTITY.md` and `VISION.md` point
+back to `STATE.md` and to each other when both exist.
 
-  - Working files (lowercase-named, e.g. `topic-description.md`):
-    exploration, chat dumps, in-progress notes, session summaries,
-    context notes, and -- for knowledge-heavy projects -- durable
-    knowledge artifacts (sources, syntheses, entities) that form
-    the project's deliverable content. May be redundant,
-    contradictory, or stale. Primary function: preserve knowledge
-    across short-lived agent sessions, so it never lives only
-    inside one chat. Err on the side of dumping -- lost knowledge
-    is more expensive than a messy file.
-  - Canonical artifacts (UPPERCASE) that describe the namespace:
-    `INDEX.md` and `OVERVIEW.md`, detailed below. The UPPERCASE
-    casing is the structural marker that distinguishes them from
-    working files; future canonical artifacts (if any emerge) follow
-    the same pattern.
+### Materials Layer
 
-* `_knowledge/materials/INDEX.md` -- Internal-facing keyword index
-  of all working files in `materials/`. This is how agents find
-  relevant materials without reading all of them. See "Materials
-  hygiene".
-* `_knowledge/materials/OVERVIEW.md` -- External-facing
-  announcement of what the materials namespace contains. Lets
-  external agents and MCP servers discover that the project exists
-  and decide whether to ask it about specific topics. Whether and
-  how the project actually serves any materials contents to outside
-  agents is a separate decision the project makes when it has
-  decided what is safe to expose; OVERVIEW.md is the announcement,
-  not a license to serve everything. Always present (shipped
-  pre-created with a default banner; replaced on first session via
-  the bootstrap flow). Describes the contents of `materials/` only
-  -- the curated layer (STATE, IDENTITY, VISION) is internal
-  scaffolding and is not externally exposed. See "When updating
-  OVERVIEW.md".
-* `_knowledge/archive/` -- Materials whose insights have been fully
-  absorbed into the knowledge layer, plus raw source material (e.g.
-  full meeting transcripts) that backs the summaries in
-  `_knowledge/materials/`. You may read files from `_knowledge/archive/` if
-  you need original source detail that a summary does not cover.
-  Files are moved here by the user after an agent surfaces a list of
-  fully-absorbed materials (see "When asked to consolidate");
-  agents do not move files into `_knowledge/archive/` themselves.
-Project context:
+`_knowledge/materials/` contains two kinds of files:
 
-* Template setup material (`README.md`) -- If the workspace was
-  started from the Project Knowledge Base template, the initial
-  `README.md` is template setup documentation, not project content.
-  Ignore it during normal operation. If it still exists alongside a
-  bootstrapped project (see "Bootstrap" below), suggest deleting it
-  -- the file's purpose was to explain the template, and that job
-  is finished once the project is in use. After deletion, a future
-  `README.md` is project content like any other file.
+* Working files: lowercase-named files such as `topic-description.md`. They
+  hold exploration, session notes, partial findings, source summaries, and
+  durable knowledge artifacts. They may be messy, redundant, contradictory, or
+  stale. Err on the side of capturing; lost knowledge is more expensive than a
+  messy file.
+* `INDEX.md` and `OVERVIEW.md`: the two canonical files that describe the
+  namespace.
 
-Implementation directories (project-specific) sit at the workspace
-root alongside `_knowledge/`. Project layout, build / run / test
-commands, and key conventions live in `_knowledge/STATE.md` or
-`_knowledge/IDENTITY.md` (when the latter exists). If you find a project
-with substantial implementation but no orientation pointers in either
-file, add a brief `## Layout` section to `_knowledge/STATE.md` -- a few
-lines naming each directory and its run command is plenty.
+`_knowledge/materials/INDEX.md` is the internal keyword index. It is how agents
+find relevant materials without reading the whole directory. A material without
+an index entry is invisible.
 
----
+`_knowledge/materials/OVERVIEW.md` is the external-facing announcement of the
+materials namespace. It helps external agents and MCP servers decide whether to
+ask this project about specific topics. It describes `materials/` only, not
+`STATE.md`, `IDENTITY.md`, or `VISION.md`. It is an announcement, not a license
+to expose every material externally.
 
-## Knowledge Layer Tiers
+`_knowledge/archive/` holds materials whose insights have been fully absorbed,
+plus raw sources that back summaries in `materials/`. Agents may read archive
+files when source detail is needed. Agents do not move files into archive unless
+the user explicitly asks; normally, surface the list of fully absorbed files and
+let the user move them.
 
-### What goes where
+### Template Setup Material
 
-* `_knowledge/STATE.md` is for what is HAPPENING now. Hot list, in-flight
-  work, open questions, action items, freshly-pinned decisions whose
-  rationale is still being absorbed. Operational. Updated every
-  session.
-* `_knowledge/IDENTITY.md` is for what the project IS. The mental model
-  and worldview. Architectural commitments. Conventions. Constraints
-  that cannot be renegotiated cheaply. The "no, you cannot do that"
-  rules that guard against shortcuts. Updated when the worldview
-  shifts (rare); treated as a deliberate act, not a side-effect of
-  feature work.
-* `_knowledge/VISION.md` is for where the project is HEADING. Long-term
-  capabilities, reframes, moon shots, ambitions worth preserving so
-  they do not get lost in day-to-day work. Updated when reflection
-  or brainstorming produces durable new ambitions. Occasional.
+If a top-level `README.md` still contains the Project Memory template setup
+instructions, treat it as setup material, not project content. Ignore it during
+normal work. Once the project is bootstrapped, suggest deleting the setup
+README; do not delete a README that has become real project documentation.
 
-When a finding is clean enough for the curated layer, decide which
-tier. Will it still be valid in three months? If yes (binding rule,
-stable architecture decision, posture commitment) ->
-`_knowledge/IDENTITY.md`. If it is something you want to be true at some
-future point -> `_knowledge/VISION.md`. Otherwise -> `_knowledge/STATE.md`.
-(This is a routing test among curated tiers, not a gate on whether
-to capture at all -- findings that are not yet curated-layer-ready
-go to `_knowledge/materials/` regardless of how durable they are.)
+### Implementation Layout
 
-### When to introduce them
+Implementation directories are project-specific. Layout, run commands, test
+commands, and key conventions belong in `STATE.md` or, when stable and
+worldview-shaped, `IDENTITY.md`.
 
-* `_knowledge/IDENTITY.md`: when a Purpose section or Design Summary
-  section in `_knowledge/STATE.md` has been substantially stable for
-  weeks and you find yourself re-explaining its content rather than
-  evolving it. Lift those sections out of `_knowledge/STATE.md` into
-  `_knowledge/IDENTITY.md` and replace with a short cross-reference.
-* `_knowledge/VISION.md`: when a brainstorm session or reflection
-  produces long-term ambitions that you want to preserve as
-  orientation without driving immediate work. The brainstorm itself
-  can stay in `_knowledge/materials/` while the durable distillation
-  moves to `_knowledge/VISION.md`.
+If a project has substantial implementation but no orientation pointers in the
+knowledge layer, add a brief `## Layout` section to `STATE.md` naming the main
+directories and commands.
 
-If a project has `_knowledge/IDENTITY.md` but no `_knowledge/VISION.md`,
-that is fine. If a project has `_knowledge/VISION.md` but no
-`_knowledge/IDENTITY.md`, that is a smell -- vision without grounded
-identity tends to drift. Add `_knowledge/IDENTITY.md` first.
+## Reading Order
 
-### Cross-references
+At the start of a session, read the cheapest sufficient context:
 
-Each knowledge layer file should open with a short preamble pointing
-at the others (whichever exist), so a reader landing on any one of
-them can find the rest. The shape:
-
-* `_knowledge/STATE.md` opens by pointing at `_knowledge/IDENTITY.md` (for
-  what the project is) and `_knowledge/VISION.md` (for where it is
-  heading) and any canonical design doc in `_knowledge/materials/`.
-* `_knowledge/IDENTITY.md` opens by pointing at `_knowledge/VISION.md` and
-  `_knowledge/STATE.md`.
-* `_knowledge/VISION.md` opens by pointing at `_knowledge/IDENTITY.md` and
-  `_knowledge/STATE.md`.
-
-### Reading order for context priming
-
-When starting a session:
-
-1. Read `_knowledge/STATE.md`. The hot list is the most informative thing
-   in the workspace.
-2. Read `_knowledge/IDENTITY.md` when the task touches architectural
-   decisions, when contemplating a shortcut, when reorienting after a
-   long break, or when uncertain whether a proposed change matches
+1. Read `_knowledge/STATE.md` first. The hot list is the most useful entry
+   point.
+2. Read `_knowledge/IDENTITY.md` when the task touches architecture, posture,
+   conventions, constraints, or when you are unsure whether a shortcut matches
    the project's worldview.
-3. Read `_knowledge/VISION.md` when doing big-picture work,
-   prioritisation, reflection, or when asked to think about
-   direction.
+3. Read `_knowledge/VISION.md` for prioritization, reflection, big-picture
+   direction, or long-term planning.
+4. Read `_knowledge/materials/INDEX.md` when you need supporting context from
+   materials, then open only the relevant materials.
 
-Do not read all three on every trivial task. Read the cheapest
-sufficient subset.
+Do not read all knowledge files for every trivial task.
 
----
+## Core Operating Rules
 
-## Rules for AI Assistants
+Maintain knowledge continuously, not as a cleanup phase:
 
-Your primary job in this workspace is to keep knowledge from getting
-lost across short-lived agent sessions. The forms vary by project
-type:
+* Update the curated layer when work produces current operational state,
+  project commitments, or long-term direction.
+* Capture working knowledge in `materials/` when it is preliminary, detailed,
+  source-like, or useful for a future agent to rediscover.
+* Keep `INDEX.md` current whenever materials membership or substantive content
+  changes.
+* Keep `OVERVIEW.md` current when the shape of the materials namespace changes.
 
-* Maintain the curated layer (`_knowledge/STATE.md`, plus
-  `_knowledge/IDENTITY.md` and `_knowledge/VISION.md` when they exist)
-  as a reliable, current set of references for the project itself.
-* Capture working knowledge into `_knowledge/materials/` -- session
-  summaries, partial findings, context another agent should not have
-  to rediscover, and (for knowledge-heavy projects) durable knowledge
-  artifacts -- so understanding persists when the chat ends and is
-  reachable by future agents.
-* Keep `_knowledge/materials/OVERVIEW.md` current as the materials
-  namespace evolves; it is the project's external-facing
-  self-description.
+Knowledge coherence is part of normal edits. When you touch a curated file or a
+materials file, re-read the sections and cross-references you touched. Fix
+obvious bookkeeping drift directly: stale index entries, moved-file references,
+or freshness markers that contradict the edit. If the fix would require
+interpreting meaning, flag it instead of guessing.
 
-The curated layer is the project's internal reference state.
-Materials are both the persistence mechanism that prevents knowledge
-loss between agents and (for knowledge-heavy projects) the project's
-deliverable knowledge namespace. Treat all of these as continuous
-responsibilities, not periodic cleanup tasks.
+## Routing Findings
 
-Knowledge coherence is part of normal edits, not only an audit
-task. When you touch a curated file or a materials file, do a
-local coherence pass before finishing the turn: re-read the
-specific sections and cross-references you touched, and check
-`_knowledge/materials/INDEX.md` when materials membership changed.
-Fix obvious bookkeeping drift directly -- a stale `INDEX.md` entry
-pointing at a file no longer in `_knowledge/materials/`, a cross-
-reference to a renamed or moved section, a freshness marker that
-contradicts the actual update. If the right fix would require
-interpreting content or changing meaning, flag it instead of
-guessing. The trigger is local evidence encountered during normal
-work; do not expand this into a full audit unless the user asks.
+When work produces a finding, decide where it belongs:
 
-`_knowledge/IDENTITY.md` and `_knowledge/VISION.md` exist only when the
-project has earned them; do not create them eagerly. When they exist,
-route findings to whichever file's role they fit (see "What goes
-where" above).
+* Put current, operational, in-flight, or soon-to-change knowledge in
+  `_knowledge/STATE.md`.
+* Put stable purpose, architecture, posture, or constraint knowledge in
+  `_knowledge/IDENTITY.md` when it exists. If it clearly belongs there but the
+  file does not exist yet, stage it in `STATE.md` and mention that it is a
+  candidate for an eventual identity lift.
+* Put long-term ambition, future direction, or moon-shot framing in
+  `_knowledge/VISION.md` when it exists. If it does not exist yet, capture the
+  material in `materials/` and mention that it may later justify `VISION.md`.
+* Put preliminary findings, source summaries, session bridges, handoffs, email
+  threads, transcripts, design notes, and detailed reference material in
+  `_knowledge/materials/`.
 
-### Markdown files
+A finding can have multiple aspects. Split operational, architectural, and
+long-term parts across the appropriate homes and cross-reference them rather
+than forcing everything into one file.
 
-These rules keep files diff-friendly, greppable, and consistently rendered in plain-text contexts.
+Capture in the same turn as you produce the finding. Do not present analysis
+and ask "shall I write this up?" Write the appropriate file and announce what
+you changed. Objection is cheaper than missed capture.
 
-When writing Markdown files, default to these rules:
+Substantial pasted context is durable by default. When the user gives a long
+handoff, email thread, meeting transcript, design note, or similar source, write
+a materials summary unless the user explicitly asks you not to.
 
-* Use one or more leading `#` for sections, not the alternative style
-  with separate underlining.
-* Prefer `*` for unordered lists over `-`. Nested lists inside
-  ordered or checkbox lists may use `-` to keep the hierarchy
-  visible.
-* Do not use text styles like bold or italic.
-* Do not use non-ASCII characters like em-dash, arrow glyphs, etc.
-  Use ASCII representations like `-`, `--`, `->`, `<->`. Exception:
-  when quoting text that uses Unicode glyphs.
-* If both list (bullet points) and tables are equally suitable,
-  prefer a list.
+Inside `_knowledge/materials/`, create files freely when you have durable
+context to preserve. Outside `materials/`, update existing curated files as the
+rules require, but do not create or move files unless the user explicitly asks
+or a specific rule here names that action.
 
-### Reporting test status
+## Updating Curated Files
 
-Report green/red, not counts. "532 tests passed" goes stale and is
-ambiguous (full suite or subset?); "full suite green".
-When a count IS informative, name what it counts
-("12 new idempotency tests added; suite green"). Applies to commits,
-knowledge layer files, and materials files.
+Curated files should read as current state, not as logs.
 
-### Local file operations
+* Rewrite the relevant section to reflect current understanding.
+* Preserve unrelated sections verbatim.
+* Do not append "update:" blocks or changelog fragments.
+* Add a new section only when a new aspect has emerged that deserves its own
+  place.
+* Keep cross-references among curated files accurate.
 
-Local file operations (Read, Write, StrReplace, Edit) are cheap. Do
-not batch them, avoid them, or stage findings in chat awaiting
-permission to write them. Read multiple files in parallel when
-relevant; write files when you have content to write. The "minimize
-tool calls" instinct applies to MCP tools and external shell
-commands, not to local file work.
+Freshness markers:
 
-### When producing findings or insights
+* `STATE.md` uses per-section markers, such as
+  `## Technical Status (updated YYYY-MM-DD)`. Update markers only on sections
+  you actually rewrite.
+* `IDENTITY.md` and `VISION.md` use a top-level marker on the document title.
+  Bump it on substantive edits.
+* Materials do not require freshness markers. For long-lived materials, an
+  inline `(updated YYYY-MM-DD)` marker on the title is useful but optional.
+  Filenames do not encode freshness unless the date is part of the event being
+  captured.
 
-* When a finding is clean and operational, update `_knowledge/STATE.md`
-  directly. If the topic already has a section, rewrite that section.
-  If it is a new aspect, add a section.
-* If the finding is binding worldview / posture / architectural
-  commitment (and `_knowledge/IDENTITY.md` exists), route there instead.
-  If `_knowledge/IDENTITY.md` does not exist but the finding clearly
-  belongs there, add it to `_knowledge/STATE.md` and flag that this is a
-  candidate for an eventual `_knowledge/IDENTITY.md` lift.
-* If the finding is long-term ambition / reframe / moon shot (and
-  `_knowledge/VISION.md` exists), route there. Otherwise, drop a
-  materials file in `_knowledge/materials/`; vision-shaped material
-  benefits from staging in materials until it stabilises.
-* A finding may have multiple aspects (operational + architectural,
-  or near-term + long-term). Split it across tiers and cross-
-  reference rather than forcing the whole thing into one home.
-* Use a `_knowledge/materials/` file when the finding is preliminary
-  (still exploring, conclusion might change), when it is a session
-  summary, when it captures context another agent should not have to
-  rediscover, when you need a staging area before synthesis, or --
-  for knowledge-heavy projects -- when capturing durable knowledge
-  artifacts (sources, syntheses, entities) that form the project's
-  deliverable content. The latter stay in `materials/` permanently;
-  they do not migrate up into the curated layer.
-* Capture in the same turn as you produce the finding. Do not
-  present analysis and ask "shall I write this up?" -- write the
-  file and announce it in the same reply. Objection is cheaper
-  than missed capture.
-* Inside `_knowledge/materials/`: create freely; name the file and
-  summarise its contents in a sentence or two in the same reply.
-* Outside `_knowledge/materials/`: never create or move a file without
-  explicit confirmation.
+### STATE.md Hot List
 
-### When updating knowledge layer files
+`STATE.md` starts with `## Hot List` after any preamble. It is the first thing
+a human or agent reads, so keep it current.
 
-* Rewrite the relevant section to reflect current understanding. Do
-  not append "update:" blocks or changelog entries -- the document
-  should always read as a clean current-state description.
-* Preserve sections unrelated to the current task verbatim.
-* If a new aspect has emerged that deserves its own section, add it
-  and suggest where it fits in the document's structure.
-* Freshness markers. Conventions vary by file type:
-  - `_knowledge/STATE.md` uses per-section markers
-    (`## Technical Status (updated YYYY-MM-DD)`) because its sections
-    are rewritten independently. Update the marker on sections you
-    actually rewrite; leave others as-is.
-  - `_knowledge/IDENTITY.md` and `_knowledge/VISION.md` use a single
-    top-level marker on the document title
-    (`# Title (updated YYYY-MM-DD)`) because the worldview and
-    ambitions tend to evolve as a whole. Bump the top-level marker
-    on any substantive edit.
-  - Materials carry no required freshness markers. When a
-    long-lived materials file has been substantially revised, an
-    inline `(updated YYYY-MM-DD)` marker on its title is useful
-    but optional. Filenames do not encode freshness.
+The hot list is a short summary of the most important facts and priorities
+right now, typically around five bullets. The number is a smell detector, not a
+hard cap. Bullets should be terse: a headline plus pointers, not status
+paragraphs.
 
-`_knowledge/STATE.md`-specific rule:
+If a bullet keeps growing, content has crept in from another section. Move the
+detail to its proper home and leave a pointer. Whenever you update any section
+of `STATE.md`, re-check the hot list and rewrite it if the change alters what
+matters most.
 
-* Hot list. `_knowledge/STATE.md` starts with a `## Hot List` section
-  immediately after any preamble. This is a short (typically ~5
-  bullets) summary of the most important facts and priorities right
-  now. The number is a heuristic for spotting trouble, not a hard
-  cap. Bullets should be terse -- one or two lines each, a headline
-  plus pointers (to action items, design docs, materials), not
-  full status paragraphs. If a bullet keeps growing, content has
-  crept in from another section; lift the detail to its proper home
-  and leave a pointer. Every time you update any section of
-  `_knowledge/STATE.md`, also re-examine the hot list and rewrite it if
-  the update changes what matters most. The hot list must always be
-  current -- it is the first thing a reader (human or AI) sees.
+## Materials Hygiene
 
-### When updating OVERVIEW.md
+### Reading Materials
 
-`_knowledge/materials/OVERVIEW.md` is the project's external-facing
-announcement of its knowledge namespace. It exists so external
-agents and MCP servers can discover that the project exists and
-decide whether to ask it about specific topics. It describes only
-the contents of `materials/` -- not STATE, IDENTITY, or VISION
-(those are internal scaffolding and are not externally exposed).
-OVERVIEW.md is the announcement, not a license to serve any
-particular file externally; whether and how to expose any specific
-material is a separate decision the project makes when it has
-decided what is safe to share, with whatever filtering it then
-designs.
+Use `_knowledge/materials/INDEX.md` to find relevant materials. Do not read all
+materials just to build context.
 
-OVERVIEW.md is always present. The template ships it pre-created
-with a default banner; the bootstrap flow fills it on first session
-based on the user's project description. From then on it is
-maintained continuously alongside the materials namespace, not
-"introduced" -- the introduce-when-earned pattern applies to
-IDENTITY.md and VISION.md, not to OVERVIEW.md.
+Do not treat materials as authoritative. If materials conflict with the curated
+layer, the curated layer wins unless the user says otherwise. If the curated
+layer appears wrong, flag the contradiction clearly.
 
-When to update it: maintain it alongside knowledge artifacts in the
-same turn. Whenever a materials change shifts the namespace's shape
--- a new topic area, materially deeper coverage of an existing area,
-or a retired area -- adjust OVERVIEW.md accordingly:
+### Creating And Updating Materials
 
-* Adjust the keyword section if the namespace shape shifted.
-* Adjust the coverage section if a topic was added, retired, or
-  changed depth.
-* Bump the freshness marker on the title.
-* Rewrite the one-line summary if the project's scope shifted
-  meaningfully.
+Use descriptive lowercase filenames. The template does not impose a fixed
+pattern beyond lowercase names for working files. Pick names that are easy to
+scan in `INDEX.md`.
 
-Keep OVERVIEW.md tight (a paragraph plus the two structured
-sections) and free of project-internal operational detail. The
-audience is external agents deciding whether to query the project's
-knowledge, and agents that have just entered and need to orient --
-not the project's own working agents (those have STATE.md and
-INDEX.md).
+Use a date prefix only when the date is part of what the file means, such as a
+meeting transcript, dated newsletter, or session summary. For evolving topic
+files, omit the date.
 
-OVERVIEW.md uses plain markdown with no YAML frontmatter. Skeleton:
+Whenever you create or substantially update a working file, update
+`_knowledge/materials/INDEX.md` in the same turn.
 
-```
-# <Project Name> -- Knowledge Base Overview (updated YYYY-MM-DD)
-
-<One-sentence external-facing description of what this project
-knows and what makes the coverage distinctive.>
-
-## Keywords
-
-<comma-separated list of 10-30 keywords covering the project's
-topics, named entities, and distinctive characteristics. Same shape
-as INDEX.md per-file entries, but project-level rather than
-per-file.>
-
-## Coverage
-
-* <topic area>: <depth indicator (e.g. Deep / Working / Light / Partial)
-  and one-line description, optionally naming safe-to-reference
-  canonical materials>
-```
-
-### Session wrap-up
-
-When a session is wrapping up -- the user signals they are done, the
-context window is filling, or the work has produced findings without
-landing in the curated layer -- preserve useful context before it is
-lost. If the context is enough for the immediate next turn only, an
-informal chat summary is fine. If it should survive beyond the chat,
-write a normal materials file with a descriptive name and add an
-`INDEX.md` entry like any other materials file. Do not create a
-special file category for this; durable context is just materials
-content until it is promoted, archived, or deleted.
-
-### When asked to consolidate
-
-When the user asks to consolidate, fold in, merge, promote, or
-otherwise move materials into the knowledge layer -- in any
-phrasing -- do the following:
-
-1. Read the specified materials and the relevant knowledge layer
-   files.
-2. Identify which insights from the materials are not yet
-   captured in the knowledge layer.
-3. Route each insight to its correct tier:
-   - Operational, in-flight, soon-to-change -> `_knowledge/STATE.md`.
-   - Stable architectural commitment, posture, worldview ->
-     `_knowledge/IDENTITY.md` (or stage in `_knowledge/STATE.md` if
-     `_knowledge/IDENTITY.md` does not exist yet, and suggest the lift).
-   - Long-term ambition, reframe, moon shot -> `_knowledge/VISION.md`
-     (or stage in `_knowledge/materials/` if `_knowledge/VISION.md` does not
-     exist yet, and suggest the lift).
-4. Rewrite the affected sections incorporating those insights.
-5. Re-examine the `_knowledge/STATE.md` hot list and rewrite it if the
-   consolidated insights change what matters most.
-6. List which materials are now fully absorbed and can be moved
-   to `_knowledge/archive/`. The user typically performs the move.
-7. After files are moved (in the same session or a later one),
-   remove their entries from `_knowledge/materials/INDEX.md`. The index
-   lists only files currently in `_knowledge/materials/`.
-8. Flag any files that are only partially absorbed (some aspects
-   still in progress, or only some sections promoted to a higher
-   tier). Partially absorbed files stay in `_knowledge/materials/` until
-   fully absorbed.
-
-For knowledge-heavy projects, recognise that some materials are
-durable knowledge artifacts (sources, syntheses, entities) that do
-not consolidate upward into the curated layer -- they ARE the
-project's reference content and stay in `materials/` permanently.
-Apply the consolidation flow only to materials whose insights belong
-in STATE / IDENTITY / VISION (operational state, posture commitments,
-long-term ambitions about the project itself). Do not propose moving
-durable knowledge artifacts to `_knowledge/archive/` just because
-they look "settled".
-
-### Materials hygiene
-
-Reading materials:
-
-* To find relevant materials, read `_knowledge/materials/INDEX.md`.
-  It contains keywords for every materials file. Use it to decide
-  which files to open -- do not read all materials to "build
-  context".
-* Do not treat materials as authoritative. If they conflict with
-  the knowledge layer, the knowledge layer wins unless the user
-  says otherwise.
-
-Creating and updating materials (working files):
-
-* Use descriptive lowercase names. The lowercase casing is what
-  marks a file as a working file rather than a canonical namespace
-  artifact (the UPPERCASE `INDEX.md` and `OVERVIEW.md`). The
-  template imposes no fixed naming pattern beyond that; pick names
-  that read well in `INDEX.md` and that future agents can scan.
-* Optionally prefix a date (`YYYY-MM-DD-topic.md`) when the file is
-  anchored to a specific event whose date is genuinely meaningful
-  -- a meeting transcript, a dated newsletter capture, a session
-  summary. For files that are designed to evolve over time, omit
-  the date; it would only encode creation, not freshness, and the
-  inline `(updated YYYY-MM-DD)` marker on the title handles
-  freshness for revised content.
-* Every time you create or substantially update a working file,
-  also update its entry in `_knowledge/materials/INDEX.md`. This is
-  not optional -- the index is how future agents find relevant
-  material. A file without an index entry is invisible.
-* When a working file leaves `_knowledge/materials/` -- moved to
-  `_knowledge/archive/`, deleted, or renamed -- remove or update its
-  entry in `INDEX.md`. The index
-  should only list files currently in `_knowledge/materials/`. This
-  applies whether you performed the move yourself or noticed
-  afterwards that the user or a past agent did; do not wait for an
-  audit prompt.
-* The `INDEX.md` entry format is:
+Index entries use this shape:
 
 ```
 ## <filename>
-<keywords, separated by commas -- aim for 10-20 per file, covering the
-main topics, names, technical terms, and concepts in the file>
+<10-20 comma-separated keywords covering the main topics, names, terms, and concepts>
 ```
 
-* When the working-file change shifts the shape of the materials
-  namespace -- a new topic area, materially deeper coverage, or a
-  retired area -- update `_knowledge/materials/OVERVIEW.md` in the
-  same turn. INDEX.md is per-file metadata (every working file
-  change touches it); OVERVIEW.md is project-level (only
-  namespace-shape changes touch it). See "When updating
-  OVERVIEW.md" for the shape of those updates.
+When a working file is renamed, deleted, or moved out of `materials/`, update
+`INDEX.md`. The index lists only files currently in `materials/`. If a file was
+moved to archive, remove its entry. If it vanished and you cannot tell why, ask
+before deleting the entry.
 
-### Validation
+When a materials change shifts the namespace's shape, update `OVERVIEW.md` too.
+`INDEX.md` is per-file metadata; `OVERVIEW.md` is project-level description.
 
-The template ships `_knowledge/check.py`, an advisory script that
-verifies the mechanically-checkable invariants -- the rules above
-that are deterministic from file content alone:
+## Updating OVERVIEW.md
 
-* Bootstrap state of the pre-shipped knowledge files (`STATE.md`
-  and `OVERVIEW.md`): sentinel banner removed, no `<...>`
-  placeholder text or unfilled `YYYY-MM-DD` markers remaining.
-* INDEX membership: every working file in `_knowledge/materials/`
-  has a `## <filename>` entry in `INDEX.md`, and every entry
-  points at a file that exists.
+`OVERVIEW.md` announces what the materials namespace covers. It is maintained
+continuously after bootstrap.
 
-Run with `python3 _knowledge/check.py` from anywhere inside the
-project (use `python` instead if your system aliases it that way).
-Reports findings, one per line, and exits 0 if clean or 1 if there
-are findings. Does not modify any file -- the user or agent fixes
-findings deliberately. Useful after substantial knowledge-layer
-work, when suspecting bookkeeping drift, before a commit, or as
-part of a session-end audit.
+Update it when materials add a new topic area, materially deepen existing
+coverage, retire an area, or change the project's externally visible scope.
 
-If Python is not available on the system, skip this step rather
-than attempt to install it. The script is advisory; manual
-inspection of `INDEX.md` membership and the pre-shipped files'
-banner / placeholder state covers the same rules and is what the
-script automates.
+On update:
 
-If a pre-shipped knowledge file (`STATE.md`, `materials/INDEX.md`,
-`materials/OVERVIEW.md`) is missing entirely, the script reports it
-with a hint to restore via `git checkout HEAD -- <path>` or to
-copy the file back from the template repo. The script does not
-attempt to recreate missing files itself; recovery is left to git
-or to manual restoration so the script does not have to keep a
-duplicate copy of the template defaults in sync with the actual
-files.
+* Adjust keywords if the namespace shape shifted.
+* Adjust coverage entries when topics are added, retired, or changed in depth.
+* Rewrite the one-line summary if the project scope shifted.
+* Bump the title freshness marker.
 
-The script's scope is intentionally narrow: it does not check
-whether the hot list reflects current priorities, whether
-OVERVIEW.md describes the namespace's actual shape, or whether
-freshness markers are honest. Those are agent responsibilities,
-not script responsibilities.
+Keep it tight: a title, one-sentence description, keywords, and a coverage
+section. Keep project-internal operational detail out. Follow the skeleton or
+banner already present in the file rather than duplicating that skeleton here.
 
-### When asked to commit
+## Session Wrap-Up
 
-When the user asks to commit, push, or otherwise capture changes in
-git -- in any phrasing -- two rules apply on top of the system's
-standard git commit guidance:
+When a session is wrapping up, the context window is filling, or useful
+findings have not landed anywhere durable, preserve the context before it is
+lost.
 
-* Default to committing only your own scope. Stage only files YOU
-  edited or created in this session, tracked from your own tool-call
-  history. Other agents or background tools may have modified files
-  concurrently; by default those are out of scope and stay unstaged.
-  If `git status` shows changes you did not make, name them in your
-  reply so the user knows they are still pending. If you cannot
-  reconstruct your scope confidently, ask; do not guess from the diff.
+If the context is only useful for the immediate next turn, a concise chat
+summary is fine. If it should survive beyond the chat, write a normal materials
+file with a descriptive name and add an `INDEX.md` entry. Do not invent a
+special session-summary category; durable context is just materials content
+until it is promoted, archived, or deleted.
 
-* The user may explicitly override commit scope. If the user says to
-  "commit all", "commit everything", "include unrelated changes", or
-  otherwise clearly asks for the whole current worktree, treat that
-  as authorization to stage and commit all non-ignored changes in the
-  repo. In that mode, first give a concise status summary, then use
-  broad staging such as `git add -A` if appropriate. Do not include
-  ignored files unless the user names them explicitly. Still stop and
-  ask before committing obvious secrets, credentials, dependency
-  directories, build caches, or unexpectedly large binaries.
+## When Asked To Consolidate
 
-* Chain related git commands into single compound shell calls.
-  - Pre-flight inspection: one call covering status, diff for the
-    relevant files, and recent log.
-  - Commit: one call covering add, commit, and status.
-  Keeping each as one compound call makes it reviewable as a unit
-  and avoids the per-call approval friction some setups have. Use
-  whatever chaining syntax the active shell accepts.
+When the user asks to consolidate, fold in, merge, promote, absorb, or otherwise
+move materials into the knowledge layer, do this:
 
-### Proactive suggestions
+1. Read the specified materials and the relevant curated files.
+2. Identify insights that are not yet captured in the curated layer.
+3. Route each insight to `STATE.md`, `IDENTITY.md`, `VISION.md`, or back to
+   `materials/` using the routing rules above.
+4. Rewrite affected curated sections so they read as current state.
+5. Re-check the `STATE.md` hot list and update it if priorities changed.
+6. List materials that are now fully absorbed and can be moved to
+   `_knowledge/archive/`.
+7. Flag materials that are only partially absorbed; they stay in `materials/`.
+8. After files are moved, remove their entries from `INDEX.md`.
 
-* If you notice the user has explored an aspect across multiple
-  materials and the understanding seems stable, suggest
-  consolidating into the knowledge layer.
-* If a knowledge layer section looks stale relative to recent chat
-  findings, mention it. If you are working in an area covered by a
-  section whose freshness date is old, say so even if the user did
-  not ask.
-* If your own analysis or evidence from code contradicts something
-  in the knowledge layer, say so explicitly and quote the specific
-  passage that conflicts, so the user can compare without hunting.
-  The knowledge layer is authoritative over materials, but it
-  is not infallible -- flag the contradiction and let the user
-  decide.
-* When creating a materials file that covers ground already in the
-  knowledge layer, say which sections overlap and whether the
-  materials file adds anything beyond what is already captured. This
-  prevents materials from silently accumulating redundant
-  material.
-* If `_knowledge/STATE.md`'s hot list keeps drifting well past ~5
-  bullets because architectural content keeps showing up there,
-  suggest introducing `_knowledge/IDENTITY.md` and lifting that
-  content out.
-* If brainstorm-shaped content keeps accumulating across materials
-  without an obvious home, suggest introducing `_knowledge/VISION.md`.
-* If you notice a materials file referenced by
-  `_knowledge/materials/INDEX.md` is no longer in
-  `_knowledge/materials/`, treat the index as out of date and repair
-  it the moment you see it -- not only during an audit. Remove the
-  entry if the file has moved to `_knowledge/archive/` (insights
-  absorbed). If the file has simply vanished with no trace in
-  archive, ask the user before deleting the entry. Apply
-  the same logic to cross-references in `_knowledge/STATE.md`,
-  `_knowledge/IDENTITY.md`, or `_knowledge/VISION.md` that point at
-  a moved or missing file.
+For knowledge-heavy projects, some materials are durable reference artifacts.
+They do not consolidate upward just because they look settled; they are the
+project's reference content and remain in `materials/`.
 
-### Auditing knowledge layer files
+## When Asked To Audit
 
-When the user asks to check, audit, or review the knowledge layer
-for staleness, contradictions, drift, or accuracy -- in any
-phrasing, including indirect prompts like "is this still right?",
-"anything outdated here?", or "does this match the code?" -- do the
-following:
+When the user asks to audit, review, sanity-check, or check the knowledge layer
+for staleness, contradictions, drift, or accuracy, do a semantic review and
+report findings rather than silently rewriting.
 
-* Read the specified file(s) in full and check each section for
-  internal consistency -- do any sections make claims that
-  contradict other sections?
-* Check freshness dates. Flag any section that has not been updated
-  in a long time, especially if the underlying topic is fast-moving.
-* If codebase references are present, spot-check whether key file
-  paths, class names, or symbols mentioned still exist in the code.
-* For `_knowledge/STATE.md`: check whether the hot list still reflects
-  the most important priorities, or whether it has drifted from
-  what the sections actually say.
-* For `_knowledge/IDENTITY.md`: check whether any section has
-  accumulated operational content that should be in
-  `_knowledge/STATE.md`, and whether any commitments have been
-  silently violated by recent work.
-* For `_knowledge/VISION.md`: check whether any of the long-term
-  ambitions have drifted into the active roadmap (promote to
-  `_knowledge/STATE.md` action items if so), and whether the
-  cross-references to `_knowledge/IDENTITY.md` commitments still hold.
-* For `_knowledge/materials/OVERVIEW.md`: check whether the keyword
-  and coverage sections still match the actual
-  shape of `materials/`. New topic areas in `materials/` that are
-  not reflected in the coverage section, or coverage entries that
-  point at retired files, are drift signals. Also check whether
-  the one-line summary still fits the project's current scope.
-* Report what you find. Do not silently rewrite -- present the
-  issues and let the user decide what to update.
+Audit the requested scope:
 
-### Bootstrap
+* Read specified files in full.
+* Check internal consistency and cross-file contradictions.
+* Check freshness markers, especially on fast-moving topics.
+* Spot-check code paths, class names, commands, or symbols referenced by the
+  knowledge layer.
+* For `STATE.md`, verify the hot list reflects the sections below it.
+* For `IDENTITY.md`, look for operational content that belongs in `STATE.md`
+  and commitments violated by recent work.
+* For `VISION.md`, look for ambitions that have become active roadmap items.
+* For `OVERVIEW.md`, check that keywords and coverage match the current shape
+  of `materials/`.
 
-The template ships pre-created knowledge files with sentinel banners
-at the top, marking them as template default content. The agent's
-job on first session is to detect those banners, interview the user,
-and replace the default content with real content based on the
-user's project description.
+Name the issues, cite the conflicting passages or missing files when useful,
+and let the user decide what to update.
 
-Detection: a knowledge file is unbootstrapped if its first non-empty
-line is a blockquote (starting with `>`) containing the phrase
-"template default content". The pre-shipped files that carry such
-banners are `_knowledge/STATE.md` and `_knowledge/materials/OVERVIEW.md`.
-`_knowledge/materials/INDEX.md` ships effectively empty (an HTML
-comment placeholder, no banner) and is filled by the agent appending
-entries naturally as working files are created -- not via bootstrap.
+## Bootstrap
 
-Partial bootstrap: if a banner is gone but `<...>` placeholder text
-or unfilled `YYYY-MM-DD` markers remain, the bootstrap was started
-but not finished. Complete it (replace placeholders, set freshness
-markers to today's date) rather than treating the file as fully
-bootstrapped. Both checks together: banner present means
-unbootstrapped; banner absent plus placeholders means broken
-bootstrap.
+The template ships with pre-created knowledge files that may contain sentinel
+banners. On first use, replace template defaults with real project content.
 
-When you find a banner-marked file in a session before the user has
-described the project, follow this procedure:
+A knowledge file is unbootstrapped if its first non-empty line is a blockquote
+containing the phrase `template default content`. The shipped files that carry
+such banners are `_knowledge/STATE.md` and `_knowledge/materials/OVERVIEW.md`.
+`_knowledge/materials/INDEX.md` ships effectively empty and fills naturally as
+materials are created.
 
-1. Ask the user what the project or investigation is about.
-2. If `_knowledge/materials/` already contains working files (the
-   user may have placed exploration notes there before opening the
-   first chat), read them and incorporate their content into the
-   filled `STATE.md` and `OVERVIEW.md`. Add `INDEX.md` entries for
-   any pre-existing working files at the same time.
-3. For each banner-marked file, replace the default content with
-   real content. Keep the structural sections (in `STATE.md`: Hot
-   List, Purpose, Open Questions, Action Items; in `OVERVIEW.md`:
-   the title summary, Keywords, Coverage). Fill freshness markers
-   with today's date. Do not leave any `<...>` placeholder text.
-4. Remove the entire `> NOTE: ...` blockquote from each file you
-   filled. The banner's job is over once real content is in place.
-5. If a top-level `README.md` exists and reads as the Project
-   Knowledge Base template's setup material (it documents how to
-   use the template, links to a `project-knowledge-base-meta`
-   companion repo, and tells readers to delete it after copying),
-   suggest deleting it. Its job is finished once the project is in
-   use. Do not delete a `README.md` whose content is project
-   documentation.
+If a banner is gone but `<...>` placeholders or unfilled `YYYY-MM-DD` markers
+remain, bootstrap was started but not finished. Complete it rather than treating
+the file as ready.
 
-Do not introduce `_knowledge/IDENTITY.md` or `_knowledge/VISION.md`
-during bootstrap. They are introduced manually as the project earns
-them; see "When to introduce them" above.
+When you find banner-marked files, bootstrap in the same turn if the user has
+already provided enough context. A project handoff, long email thread,
+transcript, design note, or similar pasted source counts as a project
+description. Do not answer only in chat.
+
+During bootstrap, fill `STATE.md` and `OVERVIEW.md`, remove the banner
+blockquotes, replace placeholders, set freshness markers to today's date, and
+add `INDEX.md` entries for any existing or newly created working files. If the
+user provided substantial source context, also write a materials summary for it.
+
+If banner-marked files are present and the user has not yet described the
+project, ask what the project or investigation is about.
+
+Do not introduce `IDENTITY.md` or `VISION.md` during bootstrap. They are added
+later when the project earns them.
+
+## Mechanical Validation
+
+The template ships `_knowledge/check.py` as an advisory consistency checker.
+Run it when the user asks to run the checker or validate the mechanical
+invariants. Also run it after substantial knowledge-layer work, when you suspect
+bookkeeping drift, before a commit, or as part of a session-end audit.
+
+Run from anywhere inside the project:
+
+```
+python3 _knowledge/check.py
+```
+
+Use `python _knowledge/check.py` instead if the system aliases Python that way.
+
+The script checks mechanical invariants such as:
+
+* Bootstrap banners removed and placeholders filled in shipped files.
+* Every working file in `materials/` has an `INDEX.md` entry.
+* Every `INDEX.md` entry points at an existing working file.
+
+The script reports findings and does not modify files. If Python is not
+available, skip the script and manually inspect the same invariants.
+
+The script does not judge whether the hot list is honest, whether
+`OVERVIEW.md` accurately describes the namespace, or whether freshness markers
+are semantically correct. It complements audit; it does not replace semantic
+review or consolidation.
+
+## Commit Scope
+
+When the user asks to commit or otherwise capture changes in git, follow the
+system and user git rules first.
+
+Project-specific defaults:
+
+* Commit only your own scope unless the user clearly asks to include all
+  changes.
+* Stage files you edited or created in this session. If other changes are
+  present, name them as left pending.
+* If the user says "commit all" or otherwise explicitly includes unrelated
+  changes, summarize the status first and still stop before committing secrets,
+  credentials, dependency directories, build caches, or unexpectedly large
+  binaries.
+
+## Proactive Suggestions
+
+Make useful knowledge-layer suggestions when evidence appears during normal
+work:
+
+* If the user has explored a topic across multiple materials and the
+  understanding seems stable, suggest consolidation.
+* If a curated section looks stale relative to recent findings, mention it. If
+  you are working in an area covered by an old freshness date, mention that too.
+* If evidence contradicts the curated layer, quote the conflicting passage and
+  explain the contradiction.
+* If a new material overlaps existing curated content, say what it adds beyond
+  what is already captured.
+* If the `STATE.md` hot list keeps absorbing architectural content, suggest
+  introducing `IDENTITY.md`.
+* If brainstorm-shaped content keeps accumulating without a home, suggest
+  introducing `VISION.md`.
+* If you notice broken `INDEX.md` membership or moved-file cross-references,
+  repair obvious drift immediately or ask when intent is unclear.

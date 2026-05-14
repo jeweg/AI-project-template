@@ -22,7 +22,40 @@ out of the box. No per-tool configuration.
    capturing what the project is about and replacing them with real
    content.
 
-That is it. No setup script, no configuration.
+That is it. No install step, no service, no per-tool configuration.
+
+## Custom project rules (AGENTS.md, CLAUDE.md)
+
+Whether your tool reads `AGENTS.md` (Cursor, Codex CLI / IDE) or
+`CLAUDE.md` (Claude Code), the template generates both files from
+the same source fragments under `_agent-rules/`. If you want to add
+project-specific or team-specific agent rules on top of the
+template's defaults, do not edit `AGENTS.md` or `CLAUDE.md`
+directly -- edit the source fragments and regenerate.
+
+The template's rules ship in `_agent-rules/50-project-memory-core.md`.
+Add your own fragments alongside: e.g. `40-team.md` for team
+conventions, `60-project.md` for project rules. The numeric prefix
+sets composition order (lower comes first). A placeholder ships as
+`_agent-rules/70-project.example.md`; copy it to a real name and
+edit.
+
+Regenerate both files:
+
+```powershell
+python _agent-rules/compose.py
+```
+
+`AGENTS.md` is the rules file Codex-compatible tools read. `CLAUDE.md`
+is a one-line shim (`@AGENTS.md`) so Claude Code reads the same
+content. The composer refuses to overwrite `AGENTS.md` if it detects
+changes it did not write, so a hand-edit (yours or an agent's) is
+not silently clobbered. Copy any such changes into `_agent-rules/*.md`
+and re-run, or pass `--force` to overwrite. Check for stale output:
+
+```powershell
+python _agent-rules/compose.py --check
+```
 
 ## What you'll observe
 
@@ -46,10 +79,6 @@ Optional, introduced when the project earns them:
   shots.
 * `_knowledge/archive/` -- consumed materials whose insights have
   been absorbed into the curated layer.
-
-`AGENTS.md` at the repo root holds the canonical always-on rules.
-`CLAUDE.md` is a one-line shim that points Claude Code at
-`AGENTS.md`; you do not need to edit it.
 
 `_knowledge/check.py` is a small advisory script that flags
 bootstrap state issues and `INDEX.md` drift. Run

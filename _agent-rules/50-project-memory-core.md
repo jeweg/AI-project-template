@@ -1,12 +1,6 @@
-# Agent Rules
+# Project Memory Core Rules
 
-This file is generated. Direct edits are refused by the next
-regenerate to avoid losing them. When the user asks for a rule change,
-edit `_agent-rules/*.md` and run `python _agent-rules/compose.py`.
-
-## Project Memory Core Rules
-
-### Purpose
+## Purpose
 
 This workspace is organized to preserve project knowledge across short-lived
 agent sessions.
@@ -15,7 +9,7 @@ The agent's primary job is to keep useful understanding from living only in
 chat. Capture findings, maintain the current state, and keep the materials
 index discoverable.
 
-### Non-Negotiable Invariants
+## Non-Negotiable Invariants
 
 * Read `_knowledge/STATE.md` first for non-trivial work.
 * Capture durable findings in the same turn; do not leave them only in chat.
@@ -32,7 +26,7 @@ index discoverable.
   archive candidates instead.
 * Keep audit, consolidation, and mechanical validation distinct.
 
-### Workspace Structure
+## Workspace Structure
 
 Project memory lives under `_knowledge/` at the workspace root. It has two
 layers with different audiences:
@@ -51,7 +45,7 @@ Product code, scripts, documents, or other project deliverables sit beside
 the deliverable may itself live under `_knowledge/materials/`; that is the
 design point, not a structural violation.
 
-#### Curated Layer
+### Curated Layer
 
 * `_knowledge/STATE.md` is always present. It records what is happening now:
   hot list, in-flight work, unresolved questions, action items, and decisions
@@ -76,7 +70,7 @@ curated files that exist. `STATE.md` points at `IDENTITY.md`, `VISION.md`, and
 any canonical design material when present. `IDENTITY.md` and `VISION.md` point
 back to `STATE.md` and to each other when both exist.
 
-#### Materials Layer
+### Materials Layer
 
 `_knowledge/materials/` contains two kinds of files:
 
@@ -104,14 +98,14 @@ files when source detail is needed. Agents do not move files into archive unless
 the user explicitly asks; normally, surface the list of fully absorbed files and
 let the user move them.
 
-#### Template Setup Material
+### Template Setup Material
 
 If a top-level `README.md` still contains the Project Memory template setup
 instructions, treat it as setup material, not project content. Ignore it during
 normal work. Once the project is bootstrapped, suggest deleting the setup
 README; do not delete a README that has become real project documentation.
 
-#### Implementation Layout
+### Implementation Layout
 
 Implementation directories are project-specific. Layout, run commands, test
 commands, and key conventions belong in `STATE.md` or, when stable and
@@ -121,7 +115,7 @@ If a project has substantial implementation but no orientation pointers in the
 knowledge layer, add a brief `## Layout` section to `STATE.md` naming the main
 directories and commands.
 
-### Reading Order
+## Reading Order
 
 At the start of a session, read the cheapest sufficient context:
 
@@ -137,7 +131,7 @@ At the start of a session, read the cheapest sufficient context:
 
 Do not read all knowledge files for every trivial task.
 
-### Core Operating Rules
+## Core Operating Rules
 
 Maintain knowledge continuously, not as a cleanup phase:
 
@@ -155,7 +149,7 @@ obvious bookkeeping drift directly: stale index entries, moved-file references,
 or freshness markers that contradict the edit. If the fix would require
 interpreting meaning, flag it instead of guessing.
 
-### Routing Findings
+## Routing Findings
 
 When work produces a finding, decide where it belongs:
 
@@ -189,7 +183,7 @@ context to preserve. Outside `materials/`, update existing curated files as the
 rules require, but do not create or move files unless the user explicitly asks
 or a specific rule here names that action.
 
-### Updating Curated Files
+## Updating Curated Files
 
 Curated files should read as current state, not as logs.
 
@@ -212,7 +206,7 @@ Freshness markers:
   Filenames do not encode freshness unless the date is part of the event being
   captured.
 
-#### STATE.md Hot List
+### STATE.md Hot List
 
 `STATE.md` starts with `## Hot List` after any preamble. It is the first thing
 a human or agent reads, so keep it current.
@@ -227,9 +221,9 @@ detail to its proper home and leave a pointer. Whenever you update any section
 of `STATE.md`, re-check the hot list and rewrite it if the change alters what
 matters most.
 
-### Materials Hygiene
+## Materials Hygiene
 
-#### Reading Materials
+### Reading Materials
 
 Use `_knowledge/materials/INDEX.md` to find relevant materials. Do not read all
 materials just to build context.
@@ -238,7 +232,7 @@ Do not treat materials as authoritative. If materials conflict with the curated
 layer, the curated layer wins unless the user says otherwise. If the curated
 layer appears wrong, flag the contradiction clearly.
 
-#### Creating And Updating Materials
+### Creating And Updating Materials
 
 Use descriptive lowercase filenames. The template does not impose a fixed
 pattern beyond lowercase names for working files. Pick names that are easy to
@@ -266,7 +260,7 @@ before deleting the entry.
 When a materials change shifts the namespace's shape, update `OVERVIEW.md` too.
 `INDEX.md` is per-file metadata; `OVERVIEW.md` is project-level description.
 
-### Updating OVERVIEW.md
+## Updating OVERVIEW.md
 
 `OVERVIEW.md` announces what the materials namespace covers. It is maintained
 continuously after bootstrap.
@@ -285,7 +279,7 @@ Keep it tight: a title, one-sentence description, keywords, and a coverage
 section. Keep project-internal operational detail out. Follow the skeleton or
 banner already present in the file rather than duplicating that skeleton here.
 
-### Session Wrap-Up
+## Session Wrap-Up
 
 When a session is wrapping up, the context window is filling, or useful
 findings have not landed anywhere durable, preserve the context before it is
@@ -297,7 +291,7 @@ file with a descriptive name and add an `INDEX.md` entry. Do not invent a
 special session-summary category; durable context is just materials content
 until it is promoted, archived, or deleted.
 
-### When Asked To Consolidate
+## When Asked To Consolidate
 
 When the user asks to consolidate, fold in, merge, promote, absorb, or otherwise
 move materials into the knowledge layer, do this:
@@ -317,7 +311,7 @@ For knowledge-heavy projects, some materials are durable reference artifacts.
 They do not consolidate upward just because they look settled; they are the
 project's reference content and remain in `materials/`.
 
-### When Asked To Audit
+## When Asked To Audit
 
 When the user asks to audit, review, sanity-check, or check the knowledge layer
 for staleness, contradictions, drift, or accuracy, do a semantic review and
@@ -340,7 +334,7 @@ Audit the requested scope:
 Name the issues, cite the conflicting passages or missing files when useful,
 and let the user decide what to update.
 
-### Bootstrap
+## Bootstrap
 
 The template ships with pre-created knowledge files that may contain sentinel
 banners. On first use, replace template defaults with real project content.
@@ -371,7 +365,7 @@ project, ask what the project or investigation is about.
 Do not introduce `IDENTITY.md` or `VISION.md` during bootstrap. They are added
 later when the project earns them.
 
-### Mechanical Validation
+## Mechanical Validation
 
 The template ships `_knowledge/check.py` as an advisory consistency checker.
 Run it when the user asks to run the checker or validate the mechanical
@@ -400,7 +394,7 @@ The script does not judge whether the hot list is honest, whether
 are semantically correct. It complements audit; it does not replace semantic
 review or consolidation.
 
-### Commit Scope
+## Commit Scope
 
 When the user asks to commit or otherwise capture changes in git, follow the
 system and user git rules first.
@@ -416,7 +410,7 @@ Project-specific defaults:
   credentials, dependency directories, build caches, or unexpectedly large
   binaries.
 
-### Proactive Suggestions
+## Proactive Suggestions
 
 Make useful knowledge-layer suggestions when evidence appears during normal
 work:
